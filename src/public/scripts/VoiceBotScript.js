@@ -282,14 +282,14 @@ function appendLiveAgentContent(messageDiv, content, data) {
       <input type="text" placeholder="full name" id="fullname" class="mb-2 formLegalCRM">
         <input type="email" name="email" id="email" class="mb-2 formLegalCRM">
         <input type="text" name="message" id="message" class="mb-2 formLegalCRM">
-          <button  class="liveagentBtn">Submit</button>
+          <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
         <div>${content}</div>
       </div>
     </div>
         `;
         // id="LiveAgentButton"
-  const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
-  liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
+  // const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
+  // liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
 }
 
 function handleLiveAgentButtonClick(data) {
