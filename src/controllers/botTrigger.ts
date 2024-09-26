@@ -50,7 +50,10 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
       temperature: 0,
     });
 
+    
+
     const botResponse = completion.choices[0]?.message.content?.trim() || "No response from model.";
+    console.log("botResponse : ",botResponse)
     chatHistory.push({ role: "assistant", content: botResponse });
 
     res.json({
