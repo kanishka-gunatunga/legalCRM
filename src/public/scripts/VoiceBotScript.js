@@ -202,7 +202,7 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
     appendListContent(messageDiv, content);
   } else if (
     content.includes(
-      "Lawyer selection will proceed"
+      "Se procederá a la selección del abogado"
     )
   ) {
     appendLiveAgentContent(messageDiv, content, data);
