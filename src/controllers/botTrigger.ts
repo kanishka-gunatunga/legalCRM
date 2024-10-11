@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import "dotenv/config";
 import { Request as ExpressRequest, Response } from "express";
+import { OperationUsage } from "@pinecone-database/pinecone/dist/data/types";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 if (
@@ -10,6 +11,8 @@ if (
 ) {
   throw new Error("Pinecone API key is not defined or is not a string.");
 }
+const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+
 
 type OpenAIMessage = {
   role: "user" | "assistant" | "system";
@@ -30,6 +33,8 @@ interface ChatEntry {
 export const chatResponseTrigger = async (req: RequestWithChatId, res: Response) => {
   try {
     let userChatId = req.body.chatId || generateChatId();
+    const index = pc.index("botdb");
+  const namespace = index.namespace("legalCRM-data-test");
 
     let chatHistory: OpenAIMessage[] = req.body.messages || [];
     const userQuestion = extractLastUserMessage(chatHistory);
@@ -41,11 +46,31 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
     updateUserMessage(chatHistory, userQuestion);
 
  
-    prependSystemMessage(chatHistory);
+    const embedding = await openai.embeddings.create({
+      model: "text-embedding-ada-002",
+      input: userQuestion,
+    });
+    let queryResponse: { matches: any; namespace?: string; usage?: OperationUsage | undefined; };
+    queryResponse = await namespace.query({
+      vector: embedding.data[0].embedding,
+      topK: 2,
+      includeMetadata: true,
+    });
+    const results: string[] = [];
+      // console.log("CONTEXT : ", queryResponse.matches[0].metadata);
+      queryResponse.matches.forEach((match: { metadata: { Title: any; Text: any; }; }) => {
+        if (match.metadata && typeof match.metadata.Title === "string") {
+          const result = `Title: ${match.metadata.Title}, \n  Content: ${match.metadata.Text} \n \n `;
+          results.push(result);
+        }
+      });
+    let context = results.join("\n");
+    console.log("context : ",context)
+    prependSystemMessage(chatHistory, context);
 
     const completion = await openai.chat.completions.create({
       messages: chatHistory,
-      model: "gpt-4",
+      model: "gpt-4o-mini",
       max_tokens: 100,
       temperature: 0,
     });
@@ -91,8 +116,8 @@ function updateUserMessage(chatHistory: OpenAIMessage[], userQuestion: string) {
   }
 }
 
-function prependSystemMessage(chatHistory: OpenAIMessage[]) {
-  const sysPrompt = `You are Jane, a friendly and helpful assistant at 'The Legal Firm.' Always greet users warmly when they greet you. Respond to all questions politely and informatively, ensuring each answer is under 75 words. If you don’t know the answer, provide a plausible response. If the user’s request clearly implies they are seeking legal representation (e.g., asking about lawyer availability or services), ask, 'You want to choose a lawyer for your case?' If they confirm, reply with 'Lawyer selection will proceed.'`;
+function prependSystemMessage(chatHistory: OpenAIMessage[],context: string) {
+  const sysPrompt = `You are Jane, a friendly and helpful assistant at 'The Legal Firm.' Always greet users warmly when they greet you. Respond to all questions politely and informatively based on ${context}, ensuring each answer is under 75 words. If you don’t know the answer, provide a plausible response. If the user’s request clearly implies they are seeking legal representation (e.g., asking about lawyer availability or services), ask, 'You want to choose a lawyer for your case?' If they confirm, reply with 'Lawyer selection will proceed.'`;
 
   chatHistory.unshift({
     role: "system",

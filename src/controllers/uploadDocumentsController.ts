@@ -6,12 +6,12 @@ import OpenAI from "openai";
 import { Pinecone } from '@pinecone-database/pinecone'
 import "dotenv/config";
 import File from '../../models/File';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+// import jwt, { JwtPayload } from 'jsonwebtoken';
 
-interface UserDecodedToken extends JwtPayload {
-  id: string;
+// interface UserDecodedToken extends JwtPayload {
+//   id: string;
   
-}
+// }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 if (!process.env.PINECONE_API_KEY || typeof process.env.PINECONE_API_KEY !== 'string') {
@@ -24,7 +24,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Define the uploadDocuments middleware
 export const uploadDocuments = async (req: Request, res: Response, next: Function) => {
-  const decode = jwt.verify(req.cookies.adminLoggedIn, "lkasdh23123h2ljqwher31414l312423") as UserDecodedToken;
+  // const decode = jwt.verify(req.cookies.adminLoggedIn, "lkasdh23123h2ljqwher31414l312423") as UserDecodedToken;
   //console.log(req.session.user.id)
     try {
       let title = req.body.title;
@@ -39,7 +39,7 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
           model: "text-embedding-ada-002",
           input: text,
       });
-      await index.namespace("hosting-cub-data").upsert([
+      await index.namespace("legalCRM-data-test").upsert([
         {
           "id": uniqueId, 
           "values": embedding.data[0].embedding,
@@ -47,15 +47,15 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
         }
       ]);
 
-      await File.create({
-      user_id: decode.id,
-      file_id: uniqueId,
-    })
+    //   await File.create({
+    //   user_id: decode.id,
+    //   file_id: uniqueId,
+    // })
     res.send('PDF upload successful.');
       }
       // const parsedData = await pdfParse(req.file.path);
       else{
-      const buffer = Buffer.from(req.file.buffer); // Convert buffer to Uint8Array
+      const buffer = Buffer.from(req.file.buffer); 
         const parsedData = await pdfParse(buffer);
       const pdfParcesData = parsedData.text
       const cleanedText = pdfParcesData.replace(/\n/g, '');
@@ -70,7 +70,7 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
     });
     //console.log(embedding.data[0].embedding);
 
-    await index.namespace("hosting-cub-data").upsert([
+    await index.namespace("legalCRM-data-test").upsert([
         {
           "id": uniqueId, 
           "values": embedding.data[0].embedding,
@@ -78,10 +78,10 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
         }
       ]);
 
-      await File.create({
-      user_id: decode.id,
-      file_id: uniqueId,
-    })
+    //   await File.create({
+    //   user_id: decode.id,
+    //   file_id: uniqueId,
+    // })
     res.send('PDF upload successful.');
     }
     } catch (error) {
