@@ -276,47 +276,91 @@ function appendListContent(messageDiv, content) {
 
 // Function - handle live agent messages
 function appendLiveAgentContent(messageDiv, content, data) {
+  const formattedTime = new Date().toLocaleTimeString(); // Assuming you have a way to format time
   messageDiv.innerHTML = `<div class="messageWrapper">
       <span class="botname-message">${formattedTime}</span>
       <div class="d-flex flex-column">
-      <input type="text" placeholder="full name" id="fullname" class="mb-2 formLegalCRM">
-        <input type="email" name="email" placeholder="email" id="email" class="mb-2 formLegalCRM">
+        <input type="text" placeholder="title" id="title" class="mb-2 formLegalCRM">
         <input type="text" name="message" placeholder="message" id="message" class="mb-2 formLegalCRM">
-          <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
+        <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
         <div>${content}</div>
       </div>
-    </div>
-        `;
-        // id="LiveAgentButton"
-  // const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
-  // liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
+    </div>`;
+
+  const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
+  liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
 }
 
 function handleLiveAgentButtonClick(data) {
   return async function () {
+    const title = document.getElementById("title").value;
+    const description = document.getElementById("message").value;
+    const personId = 1; 
+    const leadSourceId = 1; 
+    const leadTypeId = 1; 
+    const leadValue = 5000000;
+
+    const payload = {
+      title: title,
+      person_id: personId,
+      lead_source_id: leadSourceId,
+      lead_type_id: leadTypeId,
+      description: description,
+      lead_value: leadValue,
+    };
+
     try {
-      const switchResponse = await fetch("/switch-to-live-agent", {
+      const response = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ chatId: data.chatId }),
+        body: JSON.stringify(payload),
       });
-      const dataSwitchAgent = await switchResponse.json();
-      console.log("switch res : ", dataSwitchAgent);
-      if (dataSwitchAgent.status === "success") {
-        showAlert("One of our agents will join you soon. Please stay tuned.");
-        chatWithAgent = true;
-        startCheckingForAgent(data);
+
+      const responseData = await response.json();
+      console.log("API response:", responseData);
+
+      if (response.ok) {
+        // Handle successful response
+        showAlert("Lead created successfully!");
       } else {
-        // Show offline form
-        showOfflineForm();
+        // Handle error response
+        showAlert("Error creating lead: " + responseData.message);
       }
     } catch (error) {
-      console.error("Error switching to live agent:", error);
+      console.error("Error sending lead data:", error);
+      showAlert("An error occurred. Please try again later.");
     }
   };
 }
+
+
+// function handleLiveAgentButtonClick(data) {
+//   return async function () {
+//     try {
+//       const switchResponse = await fetch("/switch-to-live-agent", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ chatId: data.chatId }),
+//       });
+//       const dataSwitchAgent = await switchResponse.json();
+//       console.log("switch res : ", dataSwitchAgent);
+//       if (dataSwitchAgent.status === "success") {
+//         showAlert("One of our agents will join you soon. Please stay tuned.");
+//         chatWithAgent = true;
+//         startCheckingForAgent(data);
+//       } else {
+//         // Show offline form
+//         showOfflineForm();
+//       }
+//     } catch (error) {
+//       console.error("Error switching to live agent:", error);
+//     }
+//   };
+// }
 
 function showOfflineForm() {
   const responseDiv = document.getElementById("response");
