@@ -280,8 +280,8 @@ function appendLiveAgentContent(messageDiv, content, data) {
   messageDiv.innerHTML = `<div class="messageWrapper">
       <span class="botname-message">${formattedTime}</span>
       <div class="d-flex flex-column">
-        <input type="text" placeholder="title" id="title" class="mb-2 formLegalCRM">
-        <input type="text" name="message" placeholder="message" id="message" class="mb-2 formLegalCRM">
+        <input type="text" placeholder="title" id="title" class="mb-2 p-1 formLegalCRM">
+        <textarea type="text" name="message" placeholder="message" id="message" class="mb-2 p-1 formLegalCRM"></textarea>
         <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
         <div>${content}</div>
       </div>
