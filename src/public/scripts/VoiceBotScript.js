@@ -280,9 +280,10 @@ function appendLiveAgentContent(messageDiv, content, data) {
   messageDiv.innerHTML = `<div class="messageWrapper">
       <span class="botname-message">${formattedTime}</span>
       <div class="d-flex flex-column">
-        <input type="text" placeholder="title" id="title" class="mb-2 p-1 formLegalCRM">
-        <textarea type="text" name="message" placeholder="message" id="message" class="mb-2 p-1 formLegalCRM"></textarea>
-        <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
+        <input type="text" placeholder="Su nombre" id="title" class="mb-2 p-1 formLegalCRM">
+        <input type="tel" placeholder="Número de teléfono" id="phone" class="mb-2 p-1 formLegalCRM">
+        <input type="email" name="message" placeholder="Dirección de correo electrónico" id="message" class="mb-2 p-1 formLegalCRM">
+        <button id="LiveAgentButton" class="liveagentBtn">Entregar</button>
         <div>${content}</div>
       </div>
     </div>`;
@@ -323,7 +324,7 @@ function handleLiveAgentButtonClick(data) {
 
       if (response.ok) {
         // Handle successful response
-        showAlert("Lead created successfully!");
+        showAlert(" ¡Prospecto creado exitosamente!");
       } else {
         // Handle error response
         showAlert("Error creating lead: " + responseData.message);
