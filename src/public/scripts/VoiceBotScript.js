@@ -109,10 +109,10 @@ function showEndChatAlert() {
     );
     alertDiv.setAttribute("role", "alert");
     alertDiv.innerHTML = `
-                It seems you haven't sent a message for a while. Do you want to end the chat?
+                Parece que no has enviado ningún mensaje durante un tiempo. ¿Quieres finalizar el chat?
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose closeratingbot" onclick="handleEndChatBot()">Yes</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancel</button>
+                  <button type="button" class="btnYesToClose closeratingbot" onclick="handleEndChatBot()">Sí</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -136,10 +136,10 @@ function showEndChatAlertAgent() {
     );
     alertDiv.setAttribute("role", "alert");
     alertDiv.innerHTML = `
-                Are you sure yo want to colse this chat. Do you want to end the chat?
+                ¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose btn-end-chat closeRateAgent" onclick="handleEndChat()">Yes</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancel</button>
+                  <button type="button" class="btnYesToClose btn-end-chat closeRateAgent" onclick="handleEndChat()">Sí</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -163,10 +163,10 @@ function showEndChatAlertBot() {
     );
     alertDiv.setAttribute("role", "alert");
     alertDiv.innerHTML = `
-                Are you sure yo want to colse this chat. Do you want to end the chat?
+                ¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose abc btn-end-chat" onclick="handleEndChatBot()" >Yes</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancel</button>
+                  <button type="button" class="btnYesToClose abc btn-end-chat" onclick="handleEndChatBot()" >Sí</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -176,7 +176,7 @@ function showEndChatAlertBot() {
 
 // Function - start rating
 function handleEndChatBot() {
-  showAlertSuccess("Thank you for chatting with us.");
+  showAlertSuccess("Gracias por chatear con nosotras.");
 }
 
 // Function - handle ending the chat
@@ -327,11 +327,11 @@ function handleLiveAgentButtonClick(data) {
         showAlert(" ¡Prospecto creado exitosamente!");
       } else {
         // Handle error response
-        showAlert("Error creating lead: " + responseData.message);
+        showAlert("Error al crear cliente potencial: " + responseData.message);
       }
     } catch (error) {
       console.error("Error sending lead data:", error);
-      showAlert("An error occurred. Please try again later.");
+      showAlert("Ocurrió un error. Inténtalo de nuevo más tarde.");
     }
   };
 }
@@ -372,22 +372,22 @@ function showOfflineForm() {
               <div>Our agents are offline. Please submit your message:</div>
               <form id="offlineForm">
                   <div class="mb-3">
-                      <label for="name" class="form-label">Name</label>
+                      <label for="name" class="form-label">Su nombre</label>
                       <input type="text" class="form-control" id="name" required>
                   </div>
                   <div class="mb-3">
-                      <label for="email" class="form-label">Email</label>
+                      <label for="email" class="form-label">Correo electrónico</label>
                       <input type="email" class="form-control" id="email" required>
                   </div>
                   <div class="mb-3">
-                      <label for="subject" class="form-label">Subject</label>
+                      <label for="subject" class="form-label">Título</label>
                       <input type="text" class="form-control" id="subject" required>
                   </div>
                   <div class="mb-3">
-                      <label for="message" class="form-label">Message</label>
+                      <label for="message" class="form-label">Mensaje</label>
                       <textarea class="form-control" id="message" rows="3" required></textarea>
                   </div>
-                  <button type="submit" class="btnNotoClose">Submit</button>
+                  <button type="submit" class="btnNotoClose">Entregar</button>
               </form>
           </div>
       </div>
@@ -422,15 +422,15 @@ async function handleOfflineFormSubmission(event) {
 
     if (response.ok) {
       showAlert(
-        "Your message has been submitted successfully. Our team will get back to you soon."
+        "Su mensaje ha sido enviado con éxito. Nuestro equipo se pondrá en contacto con usted en breve."
       );
     } else {
-      showAlert("Failed to submit your message. Please try again later.");
+      showAlert("No se pudo enviar su mensaje. Inténtelo nuevamente más tarde.");
     }
   } catch (error) {
     console.error("Error submitting offline form:", error);
     showAlert(
-      "An error occurred while submitting your message. Please try again later."
+      "Se produjo un error al enviar su mensaje. Inténtelo nuevamente más tarde."
     );
   }
 }
@@ -458,7 +458,7 @@ function startCheckingForAgent(data) {
           if (dataLiveAgent.agent_id !== "unassigned") {
             if (!agentJoined) {
               showAlert(
-                "Now you are chatting with agent ID: " +
+                "Ahora estás chateando con el ID del agente:" +
                 dataLiveAgent.agent_name
               );
               agentJoined = true;
@@ -485,8 +485,8 @@ function startCheckingForAgent(data) {
   setTimeout(() => {
     clearInterval(intervalId);
     if (!agentJoined) {
-      showAlert("All agents are busy. Please try again later.");
-      console.log("No agents available. API call stopped.");
+      showAlert("Todos los agentes están ocupados. Inténtelo nuevamente más tarde.");
+      console.log("No hay agentes disponibles. Llamada API detenida.");
     }
   }, 120000);
 }
@@ -525,7 +525,7 @@ function appendPlainTextContent(messageDiv, content) {
 function appendRatingForm(messageDiv) {
   const ratingFormHTML = `
           <div class="star-rating-form d-flex flex-column px-2 py-3 mt-3" style="margin-bottom: 10px;">
-            <label for="rating">Rate your experience:</label>
+            <label for="rating">Califica tu experiencia:</label>
             <div class="rating-icons d-flex flex-row" style="border: none !important;">
               <i class="bi bi-star rating-icon"></i>
               <i class="bi bi-star rating-icon"></i>
@@ -535,14 +535,14 @@ function appendRatingForm(messageDiv) {
             </div>
             <input type="hidden" id="rating" name="rating" value="0">
             <textarea type="text" id="feedbackMessage" name="feedbackMessage" class="feedbackMessage mb-2"></textarea>
-            <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">Submit</button>
+            <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">Entregar</button>
           </div>
         `;
 
   messageDiv.innerHTML = `<div class="messageWrapper">
         <span class="botname-message">${formattedTime}</span>
         <div class="ratingFormTest">
-          <p class="mb-0">Please rate your chat experience:</p>
+          <p class="mb-0">Por favor califica tu experiencia en el chat:</p>
         </div>
         ${ratingFormHTML}
       </div>`;
