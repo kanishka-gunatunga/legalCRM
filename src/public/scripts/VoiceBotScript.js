@@ -282,7 +282,8 @@ function appendLiveAgentContent(messageDiv, content, data) {
       <div class="d-flex flex-column">
         <input type="text" placeholder="Su nombre" id="title" class="mb-2 p-1 formLegalCRM">
         <input type="tel" placeholder="Número de teléfono" id="phone" class="mb-2 p-1 formLegalCRM">
-        <input type="email" name="message" placeholder="Dirección de correo electrónico" id="message" class="mb-2 p-1 formLegalCRM">
+        <input type="email" name="email" placeholder="Dirección de correo electrónico" id="email" class="mb-2 p-1 formLegalCRM">
+        <input type="text" name="message" placeholder="mensaje" id="message" class="mb-2 p-1 formLegalCRM">
         <button id="LiveAgentButton" class="liveagentBtn">Entregar</button>
         <div>${content}</div>
       </div>
@@ -295,17 +296,15 @@ function appendLiveAgentContent(messageDiv, content, data) {
 function handleLiveAgentButtonClick(data) {
   return async function () {
     const title = document.getElementById("title").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
     const description = document.getElementById("message").value;
-    const personId = 1; 
-    const leadSourceId = 1; 
-    const leadTypeId = 1; 
-    const leadValue = 5000000;
+    const leadValue = 0;
 
     const payload = {
       title: title,
-      person_id: personId,
-      lead_source_id: leadSourceId,
-      lead_type_id: leadTypeId,
+      phone: phone,
+      email: email,
       description: description,
       lead_value: leadValue,
     };
@@ -325,6 +324,10 @@ function handleLiveAgentButtonClick(data) {
       if (response.ok) {
         // Handle successful response
         showAlert(" ¡Prospecto creado exitosamente!");
+        document.getElementById("title").value = '';
+        document.getElementById("email").value = '';
+        document.getElementById("phone").value = '';
+        document.getElementById("message").value = '';
       } else {
         // Handle error response
         showAlert("Error al crear cliente potencial: " + responseData.message);
