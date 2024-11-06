@@ -282,12 +282,12 @@ function appendLiveAgentContent(messageDiv, content, data) {
       <div class="d-flex flex-column">
         <input type="text" placeholder="Su nombre" id="title" class="mb-2 p-1 formLegalCRM">
         <input type="tel" placeholder="Número de teléfono" id="phone" class="mb-2 p-1 formLegalCRM">
-        <input type="email" name="email" placeholder="Dirección de correo electrónico" id="email" class="mb-2 p-1 formLegalCRM">
+        <input type="email" name="email" placeholder="Dirección de correo electrónico" id="email" class="mb-2 p-1 formLegalCRM">
         <input type="text" name="message" placeholder="mensaje" id="message" class="mb-2 p-1 formLegalCRM">
         <button id="LiveAgentButton" class="liveagentBtn">Entregar</button>
         <div>${content}</div>
       </div>
-    </div>`;
+    </div>`
 
   const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
   liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
@@ -300,6 +300,18 @@ function handleLiveAgentButtonClick(data) {
     const email = document.getElementById("email").value;
     const description = document.getElementById("message").value;
     const leadValue = 0;
+
+    const phonePattern = /^[0-9]{10}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!phonePattern.test(phone)) {
+      showAlert("Por favor ingrese un número de teléfono válido (10 dígitos).");
+      return;
+    }
+    if (!emailPattern.test(email)) {
+      showAlert("Por favor ingrese una dirección de correo electrónico válida.");
+      return;
+    }
 
     const payload = {
       title: title,
