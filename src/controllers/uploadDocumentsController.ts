@@ -39,7 +39,8 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
           model: "text-embedding-ada-002",
           input: text,
       });
-      await index.namespace("legalCRM-data-test").upsert([
+      // await index.namespace("legalCRM-data-test").upsert([
+        await index.namespace("legalCRM-vector-store").upsert([
         {
           "id": uniqueId, 
           "values": embedding.data[0].embedding,
@@ -70,7 +71,7 @@ export const uploadDocuments = async (req: Request, res: Response, next: Functio
     });
     //console.log(embedding.data[0].embedding);
 
-    await index.namespace("legalCRM-data-test").upsert([
+    await index.namespace("legalCRM-vector-store").upsert([
         {
           "id": uniqueId, 
           "values": embedding.data[0].embedding,
