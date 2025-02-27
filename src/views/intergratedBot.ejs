@@ -24,9 +24,11 @@
         crossorigin="anonymous"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
-        :root{
+
+        :root {
             --primary-color: #000;
         }
+
         .container {
             width: 360px;
             position: absolute;
@@ -93,7 +95,7 @@
             justify-content: end !important;
             text-align: start !important;
             color: #000;
-    font-weight: 600;
+            font-weight: 600;
         }
 
 
@@ -208,6 +210,7 @@
             width: 40px;
             height: 40px;
         }
+
         .stop-speaking-button {
             background-color: transparent;
             border-radius: 100%;
@@ -489,13 +492,25 @@
             width: 100%;
         }
 
-        .formLegalCRM{
+        .formLegalCRM {
             border: solid 1px #fff;
             border-radius: 4px;
-            background-color: transparent;
+            background-color: #fff;
+            color: #000;
         }
-        .formLegalCRM::placeholder{
-            color: #fff !important;
+
+        .formLegalCRM:-webkit-autofill,
+        .formLegalCRM:-webkit-autofill:hover,
+        .formLegalCRM:-webkit-autofill:focus,
+        .formLegalCRM:-webkit-autofill:active {
+            background-color: #fff !important;
+            color: #000 !important;
+            -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .formLegalCRM::placeholder {
+            color: #333 !important;
         }
     </style>
 </head>
@@ -529,7 +544,8 @@
                     <div class="messageWrapper">
                         <span class="botname-message" id="OpenedTime1">ChatBot</span>
                         <div>
-                            <p class="mb-2">Hello, Welcome to Hosting Cub. Please select the language to get started.</p>
+                            <p class="mb-2">Hello, Welcome to Hosting Cub. Please select the language to get started.
+                            </p>
                             <p class="mb-2">ආයුබෝවන්, Hosting Cub වෙත ඔබව සාදරයෙන් පිළිගනිමු. කරුණාකර ආරම්භ කිරීමට භාෂාව
                                 තෝරන්න.</p>
                             <p class="mb-0">வணக்கம், Hosting Cub வரவேற்கிறோம். தொடங்குவதற்கு மொழியைத்
@@ -562,19 +578,20 @@
         <div class="d-flex flex-row" style="border-top: solid 1px #e0e0e0; padding-top: 10px;">
             <form name="questionForm" id="questionForm" class="d-flex flex-row">
                 <div class="d-flex flex-column w-100">
-                    <input class="form-control chat-input" placeholder="Escribe un mensaje aquí..." id="question" name="question"
-                    required></input>
-                <input placeholder="මෙතන සිංග්ලිශ් වලින් ටයිප් කරන්න." onkeyup="startText();" onselect="startText();"
-                    onclick="startText();" class="form-control chat-input" id="box1" style="display:none;"></input>
-                <input placeholder="இங்கே Tanglish இல் தட்டச்சு செய்யவும்.." onkeyup="startTextTanglish();"
-                    onselect="startTextTanglish();" onclick="startTextTanglish();" class="form-control chat-input"
-                    id="box2" name="box2" style="display:none;"></input>
+                    <input class="form-control chat-input" placeholder="Escribe un mensaje aquí..." id="question"
+                        name="question" required></input>
+                    <input placeholder="මෙතන සිංග්ලිශ් වලින් ටයිප් කරන්න." onkeyup="startText();"
+                        onselect="startText();" onclick="startText();" class="form-control chat-input" id="box1"
+                        style="display:none;"></input>
+                    <input placeholder="இங்கே Tanglish இல் தட்டச்சு செய்யவும்.." onkeyup="startTextTanglish();"
+                        onselect="startTextTanglish();" onclick="startTextTanglish();" class="form-control chat-input"
+                        id="box2" name="box2" style="display:none;"></input>
                 </div>
                 <button type="submit" class="btn btn-light btn-lg chat-submit-button">
                     <i class="bi bi-send-fill"></i>
                 </button>
             </form>
-            
+
             <button id="startRecording" class="btn btn-light btn-lg recordButton d-none">
                 <i id="startRecordingIcon" class="bi bi-mic-fill"></i>
             </button>
