@@ -500,36 +500,26 @@
             color: #000;
         }
 
-        .formLegalCRM input:-webkit-autofill,
-        .formLegalCRM input:-webkit-autofill:hover,
-        .formLegalCRM input:-webkit-autofill:focus,
-        .formLegalCRM input:-webkit-autofill:active {
-            background-color: #fff !important;
-            color: #000 !important;
-        }
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            background-color: #fff !important;
-            color: #000 !important;
-        }
-        input:-internal-autofill-selected {
-            background-color: #fff !important;
-        }
-        input:-webkit-autofill {
+       
+        .formLegalCRM {
     background-color: #fff !important;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: #fff !important;
-}
-input:-webkit-autofill {
-    appearance: none;
+    color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s; 
 }
 
+.formLegalCRM:-webkit-autofill,
+.formLegalCRM:-webkit-autofill:hover,
+.formLegalCRM:-webkit-autofill:focus,
+.formLegalCRM:-webkit-autofill:active {
+    background-color: #fff !important;
+    -webkit-text-fill-color: #000 !important;
+    box-shadow: 0 0 0px 1000px white inset !important;
+}
 
-        .formLegalCRM::placeholder {
-            color: #000 !important;
-        }
+.formLegalCRM::placeholder {
+    color: #000 !important;
+}
+
     </style>
 </head>
 
