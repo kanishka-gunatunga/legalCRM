@@ -496,7 +496,7 @@
         .formLegalCRM {
             border: solid 1px #fff;
             border-radius: 4px;
-            background-color: #fff;
+            background-color: #fff !important;
             color: #000;
         }
 
@@ -504,6 +504,13 @@
         .formLegalCRM input:-webkit-autofill:hover,
         .formLegalCRM input:-webkit-autofill:focus,
         .formLegalCRM input:-webkit-autofill:active {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
             background-color: #fff !important;
             color: #000 !important;
         }
