@@ -517,6 +517,15 @@
         input:-internal-autofill-selected {
             background-color: #fff !important;
         }
+        input:-webkit-autofill {
+    background-color: #fff !important;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #000 !important;
+}
+input:-webkit-autofill {
+    appearance: none;
+}
+
 
         .formLegalCRM::placeholder {
             color: #000 !important;
