@@ -51,13 +51,23 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
                 let aiResponse = await getOpenAIResponse(senderId, messageText);
 
                 if(aiResponse == 'this is a lead'){
-                    await sendMessage(senderId, aiResponse, 'lead');
+                    await sendLeadButton(senderId);
                 }
                 else{
-                    await sendMessage(senderId, aiResponse, 'normal');
+                    await sendMessage(senderId, aiResponse);
                 }
                 
             }
+            if(event.postback && event.postback.payload){
+                const senderId = event.sender.id;
+                const payload = event.postback.payload;
+                if (payload === 'YES_CONTACT'){
+                  await sendLeadDetailsRequest(senderId);
+                }
+                else if (payload === 'NO_CONTACT'){
+                  await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
+                }
+              }
         }
         res.sendStatus(200);
     } else {
@@ -128,48 +138,63 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 
   }
 
-  async function sendMessage(senderId: string, message: string, type: string) {
+  async function sendMessage(senderId: string, message: string) {
 
     console.log(message);
-    if(type == 'lead'){
-        const template = {
-            recipient: { id: senderId },
-            message: {
-                attachment: {
-                    type: "template",
-                    payload: {
-                        template_type: "button",
-                        text: "Please provide your contact information:",
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Fill Contact Info",
-                                payload: JSON.stringify({ type: 'lead_form' })
-                            }
-                        ]
-                    }
-                }
-            }
-        };
-    
-        await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(template)
-        });
-    }
-    else{
-        const requestBody = {
-            recipient: { id: senderId },
-            message: { text: message }
-        };
-    
-        await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
-        });
-    }
- 
+    const requestBody = {
+        recipient: { id: senderId },
+        message: { text: message }
+    };
+
+    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+    });
 }
 
+async function sendLeadButton(senderId: string){
+    const requestBody = {
+      recipient: { id: senderId },
+      message: {
+        text: "Would you like us to contact you regarding your legal inquiry?",
+        quick_replies: [
+          {
+            content_type: "text",
+            title: "Yes",
+            payload: "YES_CONTACT"
+          },
+          {
+            content_type: "text",
+            title: "No",
+            payload: "NO_CONTACT"
+          }
+        ]
+      }
+    };
+  
+    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+  }
+  async function sendLeadDetailsRequest(senderId: string){
+    const  requestBody = {
+        recipient: { id: senderId },
+        message: {
+            text: `Hello! To better assist you, please provide the following information: \n\n
+                    1. **Full Name**: \n
+                    2. **Case Description**: \n
+                    3. **Phone Number**: \n
+                    4. **Email Address**: \n\n
+                    Please reply with the requested information, and we will get in touch with you as soon as possible.`
+        }
+    };
+  
+    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+    });
+  }
