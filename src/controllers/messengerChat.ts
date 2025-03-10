@@ -48,7 +48,16 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
                 const senderId = event.sender.id;
                 const messageText = event.message.text;
 
-                const aiResponse = await getOpenAIResponse(senderId, messageText);
+                let aiResponse = await getOpenAIResponse(senderId, messageText);
+                
+                if(aiResponse == 'this is a lead'){
+                    aiResponse = `¡Hola! Para poder ayudarte mejor, por favor proporciona la siguiente información: \n\n` +
+                      `1. **Nombre Completo**: \n` +
+                      `2. **Descripción del Caso**: \n` +
+                      `3. **Número de Teléfono**: \n` +
+                      `4. **Correo Electrónico**: \n\n` +
+                      `Por favor, responde con la información solicitada, y nos pondremos en contacto contigo lo antes posible.`;
+                }
                 await sendMessage(senderId, aiResponse);
             }
         }
@@ -91,7 +100,7 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 
     const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
     
-        If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+        If a user requests legal support or information about representation, say exactly, "this is a lead".
         
         If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
         
@@ -122,6 +131,8 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
   }
 
   async function sendMessage(senderId: string, message: string) {
+
+    console.log(message);
     const requestBody = {
         recipient: { id: senderId },
         message: { text: message }
@@ -133,31 +144,4 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
         body: JSON.stringify(requestBody)
     });
 }
-function prependSystemMessage(chatHistory: OpenAIMessage[],context: string) {
-    
-    const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
-    
-    If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
-    
-    If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
-    
-    Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
-    
-    -----
-    CONTEXT: ${context}
-    
-    -----------
-    ANSWER:
-    1. Title: Description
-    2. Title: Description
-    3. Title: Description
-    ...`;
-    
-    
-    
-      chatHistory.unshift({
-        role: "system",
-        content: sysPrompt,
-      });
-    }
 
