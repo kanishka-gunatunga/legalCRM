@@ -77,7 +77,9 @@ import { Op } from "sequelize";
 import { chatAudioResponse } from "./controllers/chatControllerAudio";
 import multer from "multer";
 import { chatTranscribeAudio } from "./controllers/TranscribeAudio";
+import { verifyWebhook,sendReply} from "./controllers/messengerChat";
 import { chatResponseTrigger } from "./controllers/botTrigger";
+
 const app = express();
 app.use(cookieParser());
 // Set up view engine
@@ -424,6 +426,10 @@ app.post("/reply-to-live-chat", replyLiveChats);
 app.post("/agent-reply-live-chat", sendReplyLiveChats);
 app.post("/close-live-chat", closeLiveChats);
 app.post("/refresh-live-chat-inner", refreshLiveChatInner);
+
+
+app.get("/messenger-webhook", verifyWebhook);
+app.post("/messenger-webhook", sendReply);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
