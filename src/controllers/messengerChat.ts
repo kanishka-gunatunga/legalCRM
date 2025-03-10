@@ -11,7 +11,7 @@ export const verifyWebhook = async (req: Request, res: Response, next: NextFunct
     const challenge = req.query["hub.challenge"];
 
     if (mode === "subscribe" && token === MESSENGER_VERIFY_TOKEN) {
-        res.status(200).send(challenge);
+        res.status(200).send(challenge); 
     } else {
         res.sendStatus(403);
     }
