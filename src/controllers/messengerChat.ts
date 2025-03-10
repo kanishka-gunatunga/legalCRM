@@ -132,35 +132,30 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 
     console.log(message);
     if(type == 'lead'){
-        const requestBody = {
+        const template = {
             recipient: { id: senderId },
-            messaging_type: "RESPONSE",
             message: {
-                text: "We need some details to assist you. Please provide the following information:",
-                quick_replies: [
-                    {
-                        content_type: "user_email",
-                        title: "Share Email",
-                        payload: "USER_EMAIL"
-                    },
-                    {
-                        content_type: "user_phone_number",
-                        title: "Share Phone",
-                        payload: "USER_PHONE"
-                    },
-                    {
-                        content_type: "text",
-                        title: "Enter Name",
-                        payload: "ENTER_NAME"
+                attachment: {
+                    type: "template",
+                    payload: {
+                        template_type: "button",
+                        text: "Please provide your contact information:",
+                        buttons: [
+                            {
+                                type: "postback",
+                                title: "Fill Contact Info",
+                                payload: JSON.stringify({ type: 'lead_form' })
+                            }
+                        ]
                     }
-                ]
+                }
             }
         };
-
+    
         await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify(template)
         });
     }
     else{
