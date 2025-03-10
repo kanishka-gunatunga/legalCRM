@@ -49,7 +49,7 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
                 const messageText = event.message.text;
 
                 let aiResponse = await getOpenAIResponse(senderId, messageText);
-                
+
                 if(aiResponse == 'this is a lead'){
                     aiResponse = `¡Hola! Para poder ayudarte mejor, por favor proporciona la siguiente información: \n\n` +
                       `1. **Nombre Completo**: \n` +
@@ -98,7 +98,7 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
        let context = results.join("\n");
        console.log("context : ",context)
 
-    const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
+    const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in English. Ensure each response is concise, under 75 words.
     
         If a user requests legal support or information about representation, say exactly, "this is a lead".
         
