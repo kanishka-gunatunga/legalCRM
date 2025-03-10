@@ -15,6 +15,7 @@ if (
 const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
 
 const MESSENGER_VERIFY_TOKEN = process.env.MESSENGER_VERIFY_TOKEN;
+const MESSENGER_ACCESS_TOKEN = process.env.MESSENGER_ACCESS_TOKEN;
 
 type OpenAIMessage = {
     role: "user" | "assistant" | "system";
@@ -126,7 +127,7 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
         message: { text: message }
     };
 
-    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.FB_PAGE_ACCESS_TOKEN}`, {
+    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
