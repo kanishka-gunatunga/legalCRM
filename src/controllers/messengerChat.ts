@@ -51,14 +51,12 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
                 let aiResponse = await getOpenAIResponse(senderId, messageText);
 
                 if(aiResponse == 'this is a lead'){
-                    aiResponse = `¡Hola! Para poder ayudarte mejor, por favor proporciona la siguiente información: \n\n` +
-                      `1. **Nombre Completo**: \n` +
-                      `2. **Descripción del Caso**: \n` +
-                      `3. **Número de Teléfono**: \n` +
-                      `4. **Correo Electrónico**: \n\n` +
-                      `Por favor, responde con la información solicitada, y nos pondremos en contacto contigo lo antes posible.`;
+                    await sendMessage(senderId, aiResponse, 'lead');
                 }
-                await sendMessage(senderId, aiResponse);
+                else{
+                    await sendMessage(senderId, aiResponse, 'normal');
+                }
+                
             }
         }
         res.sendStatus(200);
@@ -130,18 +128,53 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 
   }
 
-  async function sendMessage(senderId: string, message: string) {
+  async function sendMessage(senderId: string, message: string, type: string) {
 
     console.log(message);
-    const requestBody = {
-        recipient: { id: senderId },
-        message: { text: message }
-    };
+    if(type == 'lead'){
+        const requestBody = {
+            recipient: { id: senderId },
+            messaging_type: "RESPONSE",
+            message: {
+                text: "We need some details to assist you. Please provide the following information:",
+                quick_replies: [
+                    {
+                        content_type: "user_email",
+                        title: "Share Email",
+                        payload: "USER_EMAIL"
+                    },
+                    {
+                        content_type: "user_phone_number",
+                        title: "Share Phone",
+                        payload: "USER_PHONE"
+                    },
+                    {
+                        content_type: "text",
+                        title: "Enter Name",
+                        payload: "ENTER_NAME"
+                    }
+                ]
+            }
+        };
 
-    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
-    });
+        await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody)
+        });
+    }
+    else{
+        const requestBody = {
+            recipient: { id: senderId },
+            message: { text: message }
+        };
+    
+        await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody)
+        });
+    }
+ 
 }
 
