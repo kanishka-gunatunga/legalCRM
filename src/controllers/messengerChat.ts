@@ -156,6 +156,7 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 async function sendLeadButton(senderId: string){
     const requestBody = {
       recipient: { id: senderId },
+      messaging_type: "RESPONSE",
       message: {
         text: "Would you like us to contact you regarding your legal inquiry?",
         quick_replies: [
