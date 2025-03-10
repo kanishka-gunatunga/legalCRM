@@ -288,7 +288,7 @@ function appendLiveAgentContent(messageDiv, content, data) {
         <div class="mb-2 px-0 d-flex flex-row align-items-start">
           <input type="checkbox" id="privacyPolicyCheckbox" style="margin-right: 10px; margin-top: 3px;">
           <label for="privacyPolicyCheckbox">
-            He leído y acepto la Política de Privacidad y los Términos y Condiciones.
+            He leído y acepto la Política de privacidad y los Términos y condiciones.
           </label>
         </div>
         
