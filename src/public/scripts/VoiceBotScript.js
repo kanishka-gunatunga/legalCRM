@@ -276,22 +276,43 @@ function appendListContent(messageDiv, content) {
 
 // Function - handle live agent messages
 function appendLiveAgentContent(messageDiv, content, data) {
-  const formattedTime = new Date().toLocaleTimeString(); // Assuming you have a way to format time
+  const formattedTime = new Date().toLocaleTimeString();
   messageDiv.innerHTML = `<div class="messageWrapper">
       <span class="botname-message">${formattedTime}</span>
       <div class="d-flex flex-column">
         <input type="text" placeholder="Su nombre" id="title" class="mb-2 p-1 formLegalCRM">
         <input type="tel" placeholder="Número de teléfono" id="phone" class="mb-2 p-1 formLegalCRM">
         <input type="email" name="email" placeholder="Dirección de correo electrónico" id="email" class="mb-2 p-1 formLegalCRM">
-        <input type="text" name="message" placeholder="mensaje" id="message" class="mb-2 p-1 formLegalCRM">
-        <button id="LiveAgentButton" class="liveagentBtn">Entregar</button>
+        <input type="text" name="message" placeholder="Mensaje" id="message" class="mb-2 p-1 formLegalCRM">
+        
+        <div class="mb-2 px-0 d-flex flex-row align-items-start">
+          <input type="checkbox" id="privacyPolicyCheckbox" style="margin-right: 10px; margin-top: 3px;">
+          <label for="privacyPolicyCheckbox">
+            He leído y acepto la Política de Privacidad y los Términos y Condiciones.
+          </label>
+        </div>
+        
+        <button id="LiveAgentButton" class="liveagentBtn" disabled>Entregar</button>
         <div>${content}</div>
       </div>
-    </div>`
+    </div>`;
 
   const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
-  liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
+  const privacyCheckbox = messageDiv.querySelector("#privacyPolicyCheckbox");
+
+  privacyCheckbox.addEventListener("change", () => {
+    liveAgentButton.disabled = !privacyCheckbox.checked;
+  });
+
+  liveAgentButton.addEventListener("click", () => handleLiveAgentButtonClick(data));
 }
+
+
+{/* <label for="privacyPolicyCheckbox">
+            He leído y acepto la 
+            <a href="https://example.com/privacy-policy" target="_blank">Política de Privacidad</a> y los 
+            <a href="https://example.com/terms-conditions" target="_blank">Términos y Condiciones</a>.
+          </label> */}
 
 function handleLiveAgentButtonClick(data) {
   return async function () {
