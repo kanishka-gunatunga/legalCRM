@@ -30,10 +30,13 @@ export const viewDocuments = async (req: Request, res: Response) => {
 
               const ids = fileIds.map(file => file.file_id);
             console.log(ids);
-            const fetchResult = await index.namespace('hosting-cub-data').fetch(ids);
+            // const fetchResult = await index.namespace('legalCRM-vector-store').fetch(ids);
+            const fetchResult = await index.namespace('legalCRM-vector-store').fetch([
+                '173408559317178143122', '173408564396928036542']);
+
                 
 
-            // console.log("IDs:", fetchResult.records);
+            console.log("IDs:", fetchResult);
             
             // { ids }
             // res.render('id :', fetchResult );
