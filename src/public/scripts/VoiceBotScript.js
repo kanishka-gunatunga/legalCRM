@@ -14,29 +14,7 @@ let clientDetailsSubmitStatus = false;
 
 
 
-// language detect and set by url
-function detectLanguageFromParent() {
-  try {
-    const parentUrl = window.parent.location.href;
 
-    let detectedLanguage = "English";
-
-    if (parentUrl.includes("/es/") || parentUrl.includes("?lang=es")) {
-      detectedLanguage = "Spanish";
-    } else if (parentUrl.includes("/en/") || parentUrl.includes("?lang=en")) {
-      detectedLanguage = "English";
-    }
-
-    sessionStorage.setItem("selectedLanguage", detectedLanguage);
-
-    updatePlaceholder();
-    updateLanguageContent();
-  } catch (error) {
-    console.warn("Unable to detect parent URL language:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", detectLanguageFromParent);
 
 
 
@@ -127,7 +105,29 @@ window.addEventListener("storage", function(event) {
   }
 });
 
+// language detect and set by url
+function detectLanguageFromParent() {
+  try {
+    const parentUrl = window.parent.location.href;
 
+    let detectedLanguage = "English";
+
+    if (parentUrl.includes("/es/") || parentUrl.includes("?lang=es")) {
+      detectedLanguage = "Spanish";
+    } else if (parentUrl.includes("/en/") || parentUrl.includes("?lang=en")) {
+      detectedLanguage = "English";
+    }
+
+    sessionStorage.setItem("selectedLanguage", detectedLanguage);
+
+    updatePlaceholder();
+    updateLanguageContent();
+  } catch (error) {
+    console.warn("Unable to detect parent URL language:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", detectLanguageFromParent);
 // Function - handle error messages
 function handleErrorMessage(error) {
   const responseDiv = document.getElementById("response");
