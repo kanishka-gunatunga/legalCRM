@@ -69,6 +69,8 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
     console.log("context : ", context)
     prependSystemMessage(chatHistory, context);
 
+    console.log("chatHistory : ", chatHistory)
+
     const completion = await openai.chat.completions.create({
       messages: chatHistory,
       model: "gpt-4o-mini",
@@ -118,6 +120,39 @@ function updateUserMessage(chatHistory: OpenAIMessage[], userQuestion: string) {
 }
 
 function prependSystemMessage(chatHistory: OpenAIMessage[], context: string) {
+
+const sysPrompt = `You are a warm and friendly assistant at "The Marketing Firm." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
+
+If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+
+Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
+
+If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+
+Maintain a smooth and helpful experience for the user at all times.
+
+-----
+CONTEXT: ${context}
+
+-----------
+ANSWER:
+`;
+
+  chatHistory.unshift({
+    role: "system",
+    content: sysPrompt,
+  });
+}
+
+
+
+
+
+
+
+
+
+
   //   const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Legal Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answer in spanish language, ensuring each answer is concise, under 75 words. If a user requests legal support or information about representation, ask, "Are you looking to choose a lawyer for your case?" If they confirm, respond with "Se procederá a la selección del abogado." If you don’t have specific information, provide a plausible response while remaining within the guidelines. Do not answer from public information. 
 
   // -----
@@ -172,26 +207,19 @@ function prependSystemMessage(chatHistory: OpenAIMessage[], context: string) {
   // 3. Title: Description
   // ...`;
 
-  const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
+//   const sysPrompt = `You are a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
 
-If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+// If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
 
-If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas.
+// If a user requests legal support or information about representation, if need to contact someone from agency, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas.
 
-Do not answer general knowledge questions, such as "¿Cuál es el color de una manzana?" or "¿Cuál es la capital de Sri Lanka?" Instead, respond with: "Lo siento, no puedo proporcionar esa información." Always ensure the process is smooth and helpful. 
+// Do not use public information to answer. respond with: "Lo siento, no puedo proporcionar esa información." Always ensure the process is smooth and helpful. 
 
-Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
+// Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
 
------
-CONTEXT: ${context}
+// -----
+// CONTEXT: ${context}
 
------------
-ANSWER:
-`;
-
-
-  chatHistory.unshift({
-    role: "system",
-    content: sysPrompt,
-  });
-}
+// -----------
+// ANSWER:
+// `;
