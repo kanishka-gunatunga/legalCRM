@@ -34,6 +34,8 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
   try {
     let userChatId = req.body.chatId || generateChatId();
     let clientDetailsSubmitStatus = req.body.clientDetailsSubmitStatus;
+    let language = req.body.language;
+
     const index = pc.index("botdb");
     // const namespace = index.namespace("legalCRM-data-test");
     const namespace = index.namespace("legalCRM-vector-store");
@@ -74,7 +76,7 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
     let context = results.join("\n");
     console.log("context : ", context)
 
-    chatHistory = formatChatHistory(chatHistory, context, clientDetailsSubmitStatus, userQuestion);
+    chatHistory = formatChatHistory(chatHistory, context, clientDetailsSubmitStatus, language, userQuestion);
     // prependSystemMessage(chatHistory, context);
 
     console.log("======================================= ")
@@ -130,7 +132,29 @@ function updateUserMessage(chatHistory: OpenAIMessage[], userQuestion: string) {
 
 
 
-function formatChatHistory(chatHistory: OpenAIMessage[], context: string, clientDetailsSubmitStatus: boolean, userQuestion: string, ): OpenAIMessage[] {
+function formatChatHistory(chatHistory: OpenAIMessage[], context: string, clientDetailsSubmitStatus: boolean, language:string, userQuestion: string, ): OpenAIMessage[] {
+
+  const message1 = language === "Spanish" 
+  ?  "Lo siento, no se encontró información en el contexto proporcionado."
+  : "Sorry, no information was found in the provided context.";
+
+  const message2 = language === "Spanish" 
+  ?  "Lo siento, no puedo proporcionar esa información."
+  : "Sorry, I can't provide that information.";
+
+  const message3 = language === "Spanish" 
+  ?  "¿Está buscando elegir un agente de marketing para su caso?"
+  : "Looking to choose a marketing agent for your case?";
+
+  const message4 = language === "Spanish" 
+  ?  "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+  : "The marketing agent will be selected. An expert will contact you within the next 24 hours.";
+
+  const message5 = language === "Spanish" 
+  ?  "Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario."
+  : "We will provide you with the requested information within the next 24 hours. In the meantime, please provide your contact information so we can contact you if necessary.";
+  
+
 
   console.log("clientDetailsSubmitStatus : ", clientDetailsSubmitStatus)
   const conversationHistory = chatHistory
@@ -139,13 +163,13 @@ function formatChatHistory(chatHistory: OpenAIMessage[], context: string, client
 
   const sysPrompt: OpenAIMessage = {
     role: "system",
-    content: `You are "Asistente de JN Marketing Strategy", a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
+    content: `You are "Asistente de JN Marketing Strategy", a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in ${language}, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
 
-If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+If the requested information is not found in the given context, respond with: "${message1}"
 
-Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
+Strictly do not use public information to answer any questions. If asked, respond with: "${message2}"
 
-If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas.". ${!clientDetailsSubmitStatus ? 'If a user asks for private information (location, any contact details) about JN Legal Marketing, say: "Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario."' : ''} 
+If a user inquires about legal support, representation, or contacting someone from the agency, ask: "${message3}" If they confirm, say: "${message4}".  ${!clientDetailsSubmitStatus ? `If a user asks for private information (location, any contact details) about JN Legal Marketing, say: ${message5}` : ''}
 
 
 

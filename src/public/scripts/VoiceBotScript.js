@@ -10,6 +10,7 @@ let agentJoined = false;
 let chatStatus = "bot";
 let clientDetailsSubmitStatus = false;
 
+
 // show opening time function
 function setFormattedOpenedTime() {
   const OpenedTime = new Date();
@@ -37,13 +38,12 @@ hours = hours % 12;
 hours = hours ? hours : 12;
 formattedTime = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
 
-// Call function to set the time
 setFormattedOpenedTime();
 
-// Event listener - clear localStorage items on browser refresh
+// Event listener - clear sessionStorage items on browser refresh
 window.addEventListener("beforeunload", function (event) {
-  localStorage.removeItem("selectedLanguage");
-  localStorage.removeItem("chatId");
+  sessionStorage.removeItem("selectedLanguage");
+  sessionStorage.removeItem("chatId");
 });
 
 // Function - show typing animation
@@ -71,17 +71,23 @@ function hideTypingAnimation() {
 // Function - handle error messages
 function handleErrorMessage(error) {
   const responseDiv = document.getElementById("response");
-  let errorMessage =
-    "<p class='error-message'>The allocated number of tokens are over, please ask the administrator to add more tokens to the system.</p>";
-  if (
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
+  let errorMessage = "<p class='error-message'>The allocated number of tokens are over, please ask the administrator to add more tokens to the system.</p>";
+  
+  if (chatLang === "Spanish") {
+    errorMessage = "<p class='error-message'>El número de tokens asignado ha sido superado, por favor pida al administrador que añada más tokens al sistema.</p>";
+  } else if (
     error.message ===
     "The allocated number of tokens are over, please ask the administrator to add more tokens to the system."
   ) {
     errorMessage =
       "<p>The allocated number of tokens are over, please ask the administrator to add more tokens to the system.</p>";
   }
+
   responseDiv.innerHTML = errorMessage;
 }
+
 
 // Function - start chat timeout 150000 (if user didn't interact within 2.5 minutes )
 function startChatTimeout() {
@@ -96,6 +102,16 @@ function resetChatTimeout() {
 
 // Alert - handle chat end
 function showEndChatAlert() {
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
+    const messageYes = chatLanguage === "Spanish"
+    ? "Sí"
+    : "Yes";
+    const messageCancel = chatLanguage === "Spanish"
+    ? "Cancelar"
+    : "Cancel";
+    const messageInactive = chatLanguage === "Spanish"
+    ? "Parece que no has enviado ningún mensaje durante un tiempo. ¿Quieres finalizar el chat?"
+    : "Are you sure you want to close this chat? Do you want to end the chat?";
   if (!endChatAlertShown) {
     endChatAlertShown = true;
 
@@ -110,10 +126,10 @@ function showEndChatAlert() {
     );
     alertDiv.setAttribute("role", "alert");
     alertDiv.innerHTML = `
-                Parece que no has enviado ningún mensaje durante un tiempo. ¿Quieres finalizar el chat?
+    ${messageInactive}
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose closeratingbot" onclick="handleEndChatBot()">Sí</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
+                  <button type="button" class="btnYesToClose closeratingbot" onclick="handleEndChatBot()">${messageYes}</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">${messageCancel}</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -123,6 +139,17 @@ function showEndChatAlert() {
 
 // Alert - handle chat end for live agent
 function showEndChatAlertAgent() {
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
+  const messageYes = chatLanguage === "Spanish"
+  ? "Sí"
+  : "Yes";
+  const messageCancel = chatLanguage === "Spanish"
+  ? "Cancelar"
+  : "Cancel";
+  const messageEndChat = chatLanguage === "Spanish"
+  ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
+  : "Are you sure you want to close this chat? Do you want to end the chat?";
+
   if (!endChatAlertShown) {
     endChatAlertShown = true;
 
@@ -137,10 +164,10 @@ function showEndChatAlertAgent() {
     );
     alertDiv.setAttribute("role", "alert");
     alertDiv.innerHTML = `
-                ¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?
+                ${messageEndChat}
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose btn-end-chat closeRateAgent" onclick="handleEndChat()">Sí</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
+                  <button type="button" class="btnYesToClose btn-end-chat closeRateAgent" onclick="handleEndChat()">${messageYes}</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">${messageCancel}</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -150,6 +177,18 @@ function showEndChatAlertAgent() {
 
 // Alert - handle chat end for chat bot
 function showEndChatAlertBot() {
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
+ 
+  const messageYes = chatLanguage === "Spanish"
+  ? "Sí"
+  : "Yes";
+  const messageCancel = chatLanguage === "Spanish"
+  ? "Cancelar"
+  : "Cancel";
+  const messageEndChat = chatLanguage === "Spanish"
+  ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
+  : "Are you sure you want to close this chat? Do you want to end the chat?";
+ 
   if (!endChatAlertShown) {
     endChatAlertShown = true;
 
@@ -163,11 +202,12 @@ function showEndChatAlertBot() {
       "show"
     );
     alertDiv.setAttribute("role", "alert");
+    
     alertDiv.innerHTML = `
-                ¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?
+                ${messageEndChat}
                 <div class="d-flex flex-row">
-                  <button type="button" class="btnYesToClose abc btn-end-chat" onclick="handleEndChatBot()" >Sí</button>
-                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">Cancelar</button>
+                  <button type="button" class="btnYesToClose abc btn-end-chat" onclick="handleEndChatBot()" >${messageYes}</button>
+                  <button type="button" class="btnNotoClose ms-2" data-bs-dismiss="alert">${messageCancel}</button>
                 </div>
             `;
     responseDiv.appendChild(alertDiv);
@@ -177,20 +217,22 @@ function showEndChatAlertBot() {
 
 // Function - start rating
 function handleEndChatBot() {
-  showAlertSuccess("Gracias por chatear con nosotras.");
+  chatLanguage = sessionStorage.getItem("selectedLanguage");
+  showAlertSuccess(messageThanks);
 }
+
 
 // Function - handle ending the chat
 function handleEndChat() {
   clearTimeout(chatTimeoutId);
+  const chatLang = sessionStorage.getItem("selectedLanguage");
 
-  appendMessageToResponse(
-    "bot",
-    "Please rate your chat experience:",
-    null,
-    true
-  );
+  const message = chatLang === "Spanish"
+    ? "Por favor califique su experiencia de chat:"
+    : "Please rate your chat experience:";
+  appendMessageToResponse("bot", message, null, true);
 }
+
 
 // Function - append message to response div
 function appendMessageToResponse(role, content, data, isRatingForm = false) {
@@ -204,8 +246,10 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
   if (isList(content)) {
     appendListContent(messageDiv, content);
   } else if (
-    content.includes("Se seleccionará el agente de marketing.") || 
-  content.includes("Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario.")
+    content.includes("Se seleccionará el agente de marketing.") ||
+    content.includes("Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario.") ||
+    content.includes("We will provide you with the requested information within the next 24 hours. In the meantime, please provide your contact information so we can contact you if necessary.") ||
+    content.includes("The marketing agent will be selected. An expert will contact you within the next 24 hours.")
   ) {
     appendLiveAgentContent(messageDiv, content, data);
   } else {
@@ -214,7 +258,7 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
 
   if (isRatingForm) {
     // appendRatingForm(messageDiv);
-    const chatId = localStorage.getItem("chatId");
+    const chatId = sessionStorage.getItem("chatId");
     appendRatingForm(messageDiv, chatId);
   }
 
@@ -287,23 +331,31 @@ function appendListContent(messageDiv, content) {
 function appendLiveAgentContent(messageDiv, content, data) {
   const formattedTime = new Date().toLocaleTimeString();
   const formId = `form-${Math.random().toString(36).substr(2, 9)}`;
-  
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
+  const namePlaceholder = chatLang === "Spanish" ? "Su nombre" : "Your name";
+  const phonePlaceholder = chatLang === "Spanish" ? "Número de teléfono" : "Phone number";
+  const emailPlaceholder = chatLang === "Spanish" ? "Dirección de correo electrónico" : "Email address";
+  const messagePlaceholder = chatLang === "Spanish" ? "Mensaje" : "Message";
+  const privacyPolicyLabel = chatLang === "Spanish" 
+    ? "He leído y acepto la Política de privacidad y los Términos y condiciones." 
+    : "I have read and accept the Privacy Policy and Terms and Conditions.";
+  const buttonLabel = chatLang === "Spanish" ? "Entregar" : "Submit";
+
   messageDiv.innerHTML = `<div class="messageWrapper">
       <span class="botname-message">${formattedTime}</span>
       <div class="d-flex flex-column" id="${formId}">
-        <input type="text" placeholder="Su nombre" id="title" class="mb-2 p-1 formLegalCRM">
-        <input type="tel" placeholder="Número de teléfono" id="phone" class="mb-2 p-1 formLegalCRM">
-        <input type="email" name="email" placeholder="Dirección de correo electrónico" id="email" class="mb-2 p-1 formLegalCRM">
-        <input type="text" name="message" placeholder="Mensaje" id="message" class="mb-2 p-1 formLegalCRM">
+        <input type="text" placeholder="${namePlaceholder}" id="title" class="mb-2 p-1 formLegalCRM">
+        <input type="tel" placeholder="${phonePlaceholder}" id="phone" class="mb-2 p-1 formLegalCRM">
+        <input type="email" name="email" placeholder="${emailPlaceholder}" id="email" class="mb-2 p-1 formLegalCRM">
+        <input type="text" name="message" placeholder="${messagePlaceholder}" id="message" class="mb-2 p-1 formLegalCRM">
         
         <div class="mb-2 px-0 d-flex flex-row align-items-start">
           <input type="checkbox" id="privacyPolicyCheckbox" style="margin-right: 10px; margin-top: 3px;">
-          <label for="privacyPolicyCheckbox">
-            He leído y acepto la Política de privacidad y los Términos y condiciones.
-          </label>
+          <label for="privacyPolicyCheckbox">${privacyPolicyLabel}</label>
         </div>
         
-        <button id="LiveAgentButton" class="liveagentBtn" disabled>Entregar</button>
+        <button id="LiveAgentButton" class="liveagentBtn" disabled>${buttonLabel}</button>
         <div>${content}</div>
       </div>
     </div>`;
@@ -316,14 +368,15 @@ function appendLiveAgentContent(messageDiv, content, data) {
   });
 
   liveAgentButton.addEventListener("click", () => {
-    handleLiveAgentButtonClick(formId, data); 
+    handleLiveAgentButtonClick(formId, data);
   });
 }
 
+
 async function handleLiveAgentButtonClick(formId, data) {
-  console.log("Form ID in handler:", formId);  
-  
-  const form = document.getElementById(formId);  
+  console.log("Form ID in handler:", formId);
+
+  const form = document.getElementById(formId);
   if (!form) {
     console.error("Form not found with ID:", formId);
     return;
@@ -338,12 +391,34 @@ async function handleLiveAgentButtonClick(formId, data) {
   const phonePattern = /^[0-9]{10}$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
+
+  const phoneErrorMessage = chatLang === "Spanish" 
+    ? "Por favor ingrese un número de teléfono válido (10 dígitos)." 
+    : "Please enter a valid phone number (10 digits).";
+    
+  const emailErrorMessage = chatLang === "Spanish" 
+    ? "Por favor ingrese una dirección de correo electrónico válida." 
+    : "Please enter a valid email address.";
+    
+  const successMessage = chatLang === "Spanish" 
+    ? "¡Prospecto creado exitosamente!" 
+    : "Prospect created successfully!";
+  
+  const genericErrorMessage = chatLang === "Spanish" 
+    ? "Ocurrió un error. Inténtalo de nuevo más tarde." 
+    : "An error occurred. Please try again later.";
+    
+  
+
   if (!phonePattern.test(phone)) {
-    showAlert("Por favor ingrese un número de teléfono válido (10 dígitos).");
+    showAlert(phoneErrorMessage);
     return;
   }
+
   if (!emailPattern.test(email)) {
-    showAlert("Por favor ingrese una dirección de correo electrónico válida.");
+    showAlert(emailErrorMessage);
     return;
   }
 
@@ -354,7 +429,7 @@ async function handleLiveAgentButtonClick(formId, data) {
     description: description,
     lead_value: leadValue,
   };
-  console.log("Payload to be sent:", payload); 
+  console.log("Payload to be sent:", payload);
 
   try {
     const response = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
@@ -370,17 +445,20 @@ async function handleLiveAgentButtonClick(formId, data) {
 
     if (response.ok) {
       clientDetailsSubmitStatus = true
-      showAlert("¡Prospecto creado exitosamente!");
+      showAlert(successMessage);
       form.querySelector("#title").value = '';
       form.querySelector("#email").value = '';
       form.querySelector("#phone").value = '';
       form.querySelector("#message").value = '';
     } else {
-      showAlert("Error al crear cliente potencial: " + responseData.message);
+      const clientCreationErrorMessage = chatLang === "Spanish" 
+    ? "Error al crear cliente potencial: " + responseData.message 
+    : "Error creating prospect: " + responseData.message;
+      showAlert(clientCreationErrorMessage);
     }
   } catch (error) {
     console.error("Error sending lead data:", error);
-    showAlert("Ocurrió un error. Inténtalo de nuevo más tarde.");
+    showAlert(genericErrorMessage);
   }
 }
 
@@ -391,14 +469,14 @@ async function handleLiveAgentButtonClick(formId, data) {
           </label> */}
 
 
-          
+
 
 // ===============================================
 // ================ chat close handle =======================
 // ===============================================
 async function chatCloseByUser() {
   if (agentJoined === true) {
-    const chatId = localStorage.getItem("chatId");
+    const chatId = sessionStorage.getItem("chatId");
     const response = await fetch("/close-live-chat", {
       method: "POST",
       headers: {
@@ -523,19 +601,19 @@ document
     const questionInput = document.getElementById("question");
     const question = questionInput.value;
 
-    const selectedLanguageLocal = localStorage.getItem("selectedLanguage");
+    const selectedLanguageLocal = sessionStorage.getItem("selectedLanguage");
     chatHistory.push({ role: "user", content: question });
 
     appendMessageToResponse("user", question);
 
     console.log("selected Language:", selectedLanguageLocal);
 
-    let chatId = localStorage.getItem("chatId");
+    let chatId = sessionStorage.getItem("chatId");
     const requestBody = {
       chatId: chatId,
       messages: chatHistory,
       language: selectedLanguageLocal || "English",
-      clientDetailsSubmitStatus : clientDetailsSubmitStatus
+      clientDetailsSubmitStatus: clientDetailsSubmitStatus
     };
 
     if (chatWithAgent === false) {
@@ -560,8 +638,8 @@ document
 
         chatHistory = data.chatHistory || [];
 
-        if (!localStorage.getItem("chatId")) {
-          localStorage.setItem("chatId", data.chatId);
+        if (!sessionStorage.getItem("chatId")) {
+          sessionStorage.setItem("chatId", data.chatId);
           console.log("id: ", data.chatId);
         }
         if (data.answer !== null) {
@@ -602,19 +680,15 @@ document
 document
   .getElementById("changeToEnglishButton")
   .addEventListener("click", function () {
-    document.getElementById("box1").style.display = "none";
-    document.getElementById("box2").style.display = "none";
-    localStorage.setItem("selectedLanguage", "English");
+    sessionStorage.setItem("selectedLanguage", "English");
     appendLanguageMessage("Please ask your question in English.");
   });
 
 document
   .getElementById("changeToSpanishButton")
   .addEventListener("click", function () {
-    document.getElementById("box1").style.display = "none";
-    document.getElementById("box2").style.display = "none";
-    localStorage.setItem("selectedLanguage", "Sinhala");
-    appendLanguageMessage("කරුණාකර ඔබේ ප්‍රශ්නය සිංහලෙන් අසන්න.");
+    sessionStorage.setItem("selectedLanguage", "Spanish");
+    appendLanguageMessage("Por favor haga su pregunta en español.");
   });
 
 
@@ -628,34 +702,46 @@ document
 // ===============================================
 
 function appendRatingForm(messageDiv) {
+  // Language-specific messages
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
+  const ratingPrompt = chatLang === "Spanish" 
+    ? "Por favor califica tu experiencia en el chat:"
+    : "Please rate your chat experience:";
+
+  const submitButtonLabel = chatLang === "Spanish" 
+    ? "Entregar" 
+    : "Submit";
+
+  const formattedTime = new Date().toLocaleTimeString();
+
   const ratingFormHTML = `
-          <div class="star-rating-form d-flex flex-column px-2 py-3 mt-3" style="margin-bottom: 10px;">
-            <label for="rating">Califica tu experiencia:</label>
-            <div class="rating-icons d-flex flex-row" style="border: none !important;">
-              <i class="bi bi-star rating-icon"></i>
-              <i class="bi bi-star rating-icon"></i>
-              <i class="bi bi-star rating-icon"></i>
-              <i class="bi bi-star rating-icon"></i>
-              <i class="bi bi-star rating-icon"></i>
-            </div>
-            <input type="hidden" id="rating" name="rating" value="0">
-            <textarea type="text" id="feedbackMessage" name="feedbackMessage" class="feedbackMessage mb-2"></textarea>
-            <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">Entregar</button>
-          </div>
-        `;
+    <div class="star-rating-form d-flex flex-column px-2 py-3 mt-3" style="margin-bottom: 10px;">
+      <label for="rating">Califica tu experiencia:</label>
+      <div class="rating-icons d-flex flex-row" style="border: none !important;">
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+      </div>
+      <input type="hidden" id="rating" name="rating" value="0">
+      <textarea type="text" id="feedbackMessage" name="feedbackMessage" class="feedbackMessage mb-2"></textarea>
+      <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">${submitButtonLabel}</button>
+    </div>
+  `;
 
   messageDiv.innerHTML = `<div class="messageWrapper">
-        <span class="botname-message">${formattedTime}</span>
-        <div class="ratingFormTest">
-          <p class="mb-0">Por favor califica tu experiencia en el chat:</p>
-        </div>
-        ${ratingFormHTML}
-      </div>`;
-
-  // messageDiv.innerHTML += ratingFormHTML;
+      <span class="botname-message">${formattedTime}</span>
+      <div class="ratingFormTest">
+        <p class="mb-0">${ratingPrompt}</p>
+      </div>
+      ${ratingFormHTML}
+    </div>`;
 
   addRatingIconEventListeners(messageDiv);
 }
+
 
 function addRatingIconEventListeners(messageDiv) {
   const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
@@ -680,7 +766,7 @@ async function handleRatingSubmission() {
   const rating = ratingInput.value;
   const feedbackMessageInput = document.getElementById("feedbackMessage");
   const feedbackMessage = feedbackMessageInput.value;
-  const chatId = localStorage.getItem("chatId");
+  const chatId = sessionStorage.getItem("chatId");
 
   try {
     const response = await fetch("/save-rating", {
@@ -706,7 +792,10 @@ async function handleRatingSubmission() {
         "show"
       );
       thankYouDiv.setAttribute("role", "alert");
-      thankYouDiv.textContent = "Thank you for your feedback!";
+      const thankYouMessage = chatLanguage === "Spanish"
+    ? "¡Gracias por tus comentarios!"
+    : "Thank you for your feedback!";
+  thankYouDiv.textContent = thankYouMessage;
       responseDiv.appendChild(thankYouDiv);
       thankYouDiv.scrollIntoView({ behavior: "smooth" });
     }
