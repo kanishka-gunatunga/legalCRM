@@ -51,13 +51,17 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
       model: "text-embedding-ada-002",
       input: userQuestion,
     });
+
     let queryResponse: { matches: any; namespace?: string; usage?: OperationUsage | undefined; };
+
     queryResponse = await namespace.query({
       vector: embedding.data[0].embedding,
       topK: 2,
       includeMetadata: true,
     });
+
     const results: string[] = [];
+
     // console.log("CONTEXT : ", queryResponse.matches[0].metadata);
     queryResponse.matches.forEach((match: { metadata: { Title: any; Text: any; }; }) => {
       if (match.metadata && typeof match.metadata.Title === "string") {
@@ -65,16 +69,20 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
         results.push(result);
       }
     });
+
     let context = results.join("\n");
     console.log("context : ", context)
-    prependSystemMessage(chatHistory, context);
 
+    chatHistory = formatChatHistory(chatHistory, context, userQuestion);
+    // prependSystemMessage(chatHistory, context);
+
+    console.log("======================================= ")
     console.log("chatHistory : ", chatHistory)
 
     const completion = await openai.chat.completions.create({
       messages: chatHistory,
       model: "gpt-4o-mini",
-      max_tokens: 150,
+      max_tokens: 300,
       temperature: 0,
     });
 
@@ -121,7 +129,7 @@ function updateUserMessage(chatHistory: OpenAIMessage[], userQuestion: string) {
 
 function prependSystemMessage(chatHistory: OpenAIMessage[], context: string) {
 
-const sysPrompt = `You are a warm and friendly assistant at "The Marketing Firm." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
+const sysPrompt = `You are a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
 
 If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
 
@@ -142,6 +150,38 @@ ANSWER:
     role: "system",
     content: sysPrompt,
   });
+}
+
+function formatChatHistory(chatHistory: OpenAIMessage[], context: string, userQuestion: string): OpenAIMessage[] {
+  const conversationHistory = chatHistory
+    .filter(msg => msg.role !== "system")
+    .slice(-5);
+
+  const sysPrompt: OpenAIMessage = {
+    role: "system",
+    content: `You are "Asistente de JN Marketing Strategy", a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
+
+If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+
+Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
+
+If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+
+Maintain a smooth and helpful experience for the user at all times. 
+
+Do not use bold formatting on answer such as **.
+
+-----
+CONTEXT: ${context}
+
+-----------
+ANSWER:
+`,
+  };
+
+  // const lastUserMessage: OpenAIMessage = { role: "user", content: userQuestion };
+
+  return [sysPrompt, ...conversationHistory];
 }
 
 

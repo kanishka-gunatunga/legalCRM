@@ -195,6 +195,8 @@ function handleEndChat() {
 function appendMessageToResponse(role, content, data, isRatingForm = false) {
   const responseDiv = document.getElementById("response");
 
+  content = content.replace(/\*\*(.*?)\*\*/g, "$1");
+
   const messageDiv = createMessageDiv(isRatingForm ? "rate" : role, content);
   const image = createMessageImage(isRatingForm ? "rate" : role);
 
