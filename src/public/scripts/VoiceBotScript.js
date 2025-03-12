@@ -11,6 +11,39 @@ let chatStatus = "bot";
 let clientDetailsSubmitStatus = false;
 
 
+
+
+
+// language detect and set by url
+function detectLanguageFromParent() {
+  try {
+    const parentUrl = window.parent.location.href;
+
+    let detectedLanguage = "English";
+
+    if (parentUrl.includes("/es/") || parentUrl.includes("?lang=es")) {
+      detectedLanguage = "Spanish";
+    } else if (parentUrl.includes("/en/") || parentUrl.includes("?lang=en")) {
+      detectedLanguage = "English";
+    }
+
+    sessionStorage.setItem("selectedLanguage", detectedLanguage);
+
+    updatePlaceholder();
+    updateLanguageContent();
+  } catch (error) {
+    console.warn("Unable to detect parent URL language:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", detectLanguageFromParent);
+
+
+
+
+
+
+
 // show opening time function
 function setFormattedOpenedTime() {
   const OpenedTime = new Date();
