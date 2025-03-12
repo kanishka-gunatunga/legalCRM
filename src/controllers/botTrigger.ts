@@ -169,7 +169,7 @@ If the requested information is not found in the given context, respond with: "$
 
 Strictly do not use public information to answer any questions. If asked, respond with: "${message2}"
 
-If a user inquires about legal support, representation, or contacting someone from the agency, ask: "${message3}" If they confirm, say: "${message4}".  ${!clientDetailsSubmitStatus ? `If a user asks for private information (location, any contact details) about JN Legal Marketing, say: ${message5}` : ''}
+If a user inquires about legal support, representation, or contacting someone from the agency, ask: "${message3}" If they confirm, say: "${message4}".  ${!clientDetailsSubmitStatus ? `If a user asks for private information (location, information about owner, any contact details) about JN Legal Marketing, say: ${message5}` : ''}
 
 
 
