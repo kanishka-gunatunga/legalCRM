@@ -68,6 +68,33 @@ function hideTypingAnimation() {
   }
 }
 
+
+function updatePlaceholder() {
+  const questionInput = document.getElementById("question");
+  const assistantText = document.querySelector(".assistant-name");
+  const statusText = document.querySelector(".assistant-status");
+  const chatLang = sessionStorage.getItem("selectedLanguage") || "English";
+  if (chatLang === "Spanish") {
+    assistantText.textContent = "Asistente de JN Marketing Strategy";
+    statusText.textContent = "En línea";
+  } else {
+    assistantText.textContent = "JN Marketing Strategy Assistant";
+    statusText.textContent = "Online";
+  }
+  questionInput.placeholder = chatLang === "Spanish"
+    ? "Escribe un mensaje aquí..."
+    : "Type a message here...";
+}
+
+document.addEventListener("DOMContentLoaded", updatePlaceholder);
+
+window.addEventListener("storage", function(event) {
+  if (event.key === "selectedLanguage") {
+    updatePlaceholder();
+  }
+});
+
+
 // Function - handle error messages
 function handleErrorMessage(error) {
   const responseDiv = document.getElementById("response");
@@ -682,6 +709,7 @@ document
   .addEventListener("click", function () {
     sessionStorage.setItem("selectedLanguage", "English");
     appendLanguageMessage("Please ask your question in English.");
+    updatePlaceholder();
   });
 
 document
@@ -689,6 +717,7 @@ document
   .addEventListener("click", function () {
     sessionStorage.setItem("selectedLanguage", "Spanish");
     appendLanguageMessage("Por favor haga su pregunta en español.");
+    updatePlaceholder();
   });
 
 
