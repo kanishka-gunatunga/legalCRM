@@ -33,6 +33,7 @@ interface ChatEntry {
 export const chatResponseTrigger = async (req: RequestWithChatId, res: Response) => {
   try {
     let userChatId = req.body.chatId || generateChatId();
+    let clientDetailsSubmitStatus = req.body.clientDetailsSubmitStatus;
     const index = pc.index("botdb");
     // const namespace = index.namespace("legalCRM-data-test");
     const namespace = index.namespace("legalCRM-vector-store");
@@ -73,7 +74,7 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
     let context = results.join("\n");
     console.log("context : ", context)
 
-    chatHistory = formatChatHistory(chatHistory, context, userQuestion);
+    chatHistory = formatChatHistory(chatHistory, context, clientDetailsSubmitStatus, userQuestion);
     // prependSystemMessage(chatHistory, context);
 
     console.log("======================================= ")
@@ -127,32 +128,11 @@ function updateUserMessage(chatHistory: OpenAIMessage[], userQuestion: string) {
   }
 }
 
-function prependSystemMessage(chatHistory: OpenAIMessage[], context: string) {
 
-const sysPrompt = `You are a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
 
-If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+function formatChatHistory(chatHistory: OpenAIMessage[], context: string, clientDetailsSubmitStatus: boolean, userQuestion: string, ): OpenAIMessage[] {
 
-Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
-
-If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
-
-Maintain a smooth and helpful experience for the user at all times.
-
------
-CONTEXT: ${context}
-
------------
-ANSWER:
-`;
-
-  chatHistory.unshift({
-    role: "system",
-    content: sysPrompt,
-  });
-}
-
-function formatChatHistory(chatHistory: OpenAIMessage[], context: string, userQuestion: string): OpenAIMessage[] {
+  console.log("clientDetailsSubmitStatus : ", clientDetailsSubmitStatus)
   const conversationHistory = chatHistory
     .filter(msg => msg.role !== "system")
     .slice(-5);
@@ -165,11 +145,11 @@ If the requested information is not found in the given context, respond with: "L
 
 Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
 
-If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas.". ${!clientDetailsSubmitStatus ? 'If a user asks for private information (location, any contact details) about JN Legal Marketing, say: "Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario."' : ''} 
 
-Maintain a smooth and helpful experience for the user at all times. 
 
-Do not use bold formatting on answer such as **.
+
+Maintain a smooth and helpful experience for the user at all times.
 
 -----
 CONTEXT: ${context}
@@ -178,8 +158,6 @@ CONTEXT: ${context}
 ANSWER:
 `,
   };
-
-  // const lastUserMessage: OpenAIMessage = { role: "user", content: userQuestion };
 
   return [sysPrompt, ...conversationHistory];
 }
@@ -193,59 +171,85 @@ ANSWER:
 
 
 
-  //   const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Legal Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answer in spanish language, ensuring each answer is concise, under 75 words. If a user requests legal support or information about representation, ask, "Are you looking to choose a lawyer for your case?" If they confirm, respond with "Se procederá a la selección del abogado." If you don’t have specific information, provide a plausible response while remaining within the guidelines. Do not answer from public information. 
+// function prependSystemMessage(chatHistory: OpenAIMessage[], context: string) {
 
-  // -----
-  // CONTEXT: ${context}
+//   const sysPrompt = `You are a warm and friendly assistant at "JN Marketing Strategy." Always greet users kindly when they start a conversation, making them feel welcome. Respond in Spanish, keeping your replies polite, concise (under 150 words), and informative based on the provided context.
 
-  // -----------
-  // ANSWER: `;
+// If the requested information is not found in the given context, respond with: "Lo siento, no se encontró información en el contexto proporcionado."
+
+// Strictly do not use public information to answer any questions. If asked, respond with: "Lo siento, no puedo proporcionar esa información."
+
+// If a user inquires about legal support, representation, or contacting someone from the agency, ask: "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+
+// Maintain a smooth and helpful experience for the user at all times.
+
+// -----
+// CONTEXT: ${context}
+
+// -----------
+// ANSWER:
+// `;
+
+//   chatHistory.unshift({
+//     role: "system",
+//     content: sysPrompt,
+//   });
+// }
 
 
-  // const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Legal Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
+//   const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Legal Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answer in spanish language, ensuring each answer is concise, under 75 words. If a user requests legal support or information about representation, ask, "Are you looking to choose a lawyer for your case?" If they confirm, respond with "Se procederá a la selección del abogado." If you don’t have specific information, provide a plausible response while remaining within the guidelines. Do not answer from public information.
 
-  // If a user requests legal support or information about representation, ask, "¿Estás buscando elegir un abogado para tu caso?" If they confirm, reply, "Se procederá a la selección del abogado. Un experto se pondrá en contacto contigo dentro de las próximas 24 horas."
+// -----
+// CONTEXT: ${context}
 
-  // If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
+// -----------
+// ANSWER: `;
 
-  // Avoid using public information and focus on providing relevant assistance.
 
-  // -----
-  // CONTEXT: ${context}
+// const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Legal Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
 
-  // -----------
-  // ANSWER: `;
+// If a user requests legal support or information about representation, ask, "¿Estás buscando elegir un abogado para tu caso?" If they confirm, reply, "Se procederá a la selección del abogado. Un experto se pondrá en contacto contigo dentro de las próximas 24 horas."
 
-  // const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
+// If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
 
-  // If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso."If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+// Avoid using public information and focus on providing relevant assistance.
 
-  // If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
+// -----
+// CONTEXT: ${context}
 
-  // Do not use public information and focus on providing relevant assistance.
-  // -----
-  // CONTEXT: ${context}
+// -----------
+// ANSWER: `;
 
-  // -----------
-  // ANSWER: `;
+// const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
 
-  // const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
+// If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso."If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
 
-  // If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+// If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
 
-  // If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
+// Do not use public information and focus on providing relevant assistance.
+// -----
+// CONTEXT: ${context}
 
-  // Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
+// -----------
+// ANSWER: `;
 
-  // -----
-  // CONTEXT: ${context}
+// const sysPrompt = `You are Jane, a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
 
-  // -----------
-  // ANSWER:
-  // 1. Title: Description
-  // 2. Title: Description
-  // 3. Title: Description
-  // ...`;
+// If a user requests legal support or information about representation, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, reply, "Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas."
+
+// If you don’t have specific information, provide a plausible response while staying within the guidelines. To improve client experience, collect information from the prospect as part of the process. Additionally, if lawyers allow, inform the prospect of the office phone number and email for direct contact. Always ensure the process is smooth and helpful.
+
+// Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
+
+// -----
+// CONTEXT: ${context}
+
+// -----------
+// ANSWER:
+// 1. Title: Description
+// 2. Title: Description
+// 3. Title: Description
+// ...`;
 
 //   const sysPrompt = `You are a friendly and helpful assistant at "The Marketing Firm." Greet users warmly when they initiate a conversation. Respond to all questions politely and informatively based on the provided context, answering in Spanish. Ensure each response is concise, under 75 words.
 
@@ -253,7 +257,7 @@ ANSWER:
 
 // If a user requests legal support or information about representation, if need to contact someone from agency, ask, "¿Está buscando elegir un agente de marketing para su caso?" If they confirm, say: Se seleccionará el agente de marketing. Un experto se comunicará con usted dentro de las próximas 24 horas.
 
-// Do not use public information to answer. respond with: "Lo siento, no puedo proporcionar esa información." Always ensure the process is smooth and helpful. 
+// Do not use public information to answer. respond with: "Lo siento, no puedo proporcionar esa información." Always ensure the process is smooth and helpful.
 
 // Do not use any special formatting, such as bold, italics, or symbols like **, *, _, or ~. Present all text in plain format.
 
