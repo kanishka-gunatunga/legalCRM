@@ -84,7 +84,7 @@ function updatePlaceholder() {
   const questionInput = document.getElementById("question");
   const assistantText = document.querySelector(".assistant-name");
   const statusText = document.querySelector(".assistant-status");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "English";
+  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
   if (chatLang === "Spanish") {
     assistantText.textContent = "Asistente de JN Marketing Strategy";
     statusText.textContent = "En línea";
@@ -97,7 +97,6 @@ function updatePlaceholder() {
     : "Type a message here...";
 }
 
-document.addEventListener("DOMContentLoaded", updatePlaceholder);
 
 window.addEventListener("storage", function(event) {
   if (event.key === "selectedLanguage") {
@@ -105,29 +104,8 @@ window.addEventListener("storage", function(event) {
   }
 });
 
-// language detect and set by url
-function detectLanguageFromParent() {
-  try {
-    const parentUrl = window.parent.location.href;
 
-    let detectedLanguage = "English";
 
-    if (parentUrl.includes("/es/") || parentUrl.includes("?lang=es")) {
-      detectedLanguage = "Spanish";
-    } else if (parentUrl.includes("/en/") || parentUrl.includes("?lang=en")) {
-      detectedLanguage = "English";
-    }
-
-    sessionStorage.setItem("selectedLanguage", detectedLanguage);
-
-    updatePlaceholder();
-    updateLanguageContent();
-  } catch (error) {
-    console.warn("Unable to detect parent URL language:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", detectLanguageFromParent);
 // Function - handle error messages
 function handleErrorMessage(error) {
   const responseDiv = document.getElementById("response");
@@ -672,7 +650,7 @@ document
     const requestBody = {
       chatId: chatId,
       messages: chatHistory,
-      language: selectedLanguageLocal || "English",
+      language: selectedLanguageLocal || "Spanish",
       clientDetailsSubmitStatus: clientDetailsSubmitStatus
     };
 
