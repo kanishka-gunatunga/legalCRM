@@ -24,60 +24,61 @@ type OpenAIMessage = {
   };
 
   
-export const verifyWebhook = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyWebhookInsta = async (req: Request, res: Response, next: NextFunction) => {
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
 
-    if (mode === "subscribe" && token === MESSENGER_VERIFY_TOKEN) {
-        res.status(200).send(challenge); 
+    if (mode === "subscribe" && token === process.env.MESSENGER_VERIFY_TOKEN) {
+        res.status(200).send(challenge);
     } else {
         res.sendStatus(403);
     }
 
 };
 
-export const sendReply = async (req: Request, res: Response, next: NextFunction) => {
+export const sendReplyInsta = async (req: Request, res: Response, next: NextFunction) => {
     try {
-    const body = req.body;
-    if (body.object === "page") {
-        for (const entry of body.entry) {
-            const event = entry.messaging[0];
+        const body = req.body;
+        if (body.object === "instagram") {
+            for (const entry of body.entry) {
+                for (const change of entry.changes) {
+                    if (change.field === "messages") {
+                        const value = change.value;
+                        if (value && value.messages && value.messages.length > 0) {
+                            const message = value.messages[0];
+                            const senderId = value.sender.id;
+                            const messageText = message.text;
 
-            if (event.message && event.message.text) {
-                const senderId = event.sender.id;
-                const messageText = event.message.text;
+                            let aiResponse = await getOpenAIResponse(senderId, messageText);
 
-                let aiResponse = await getOpenAIResponse(senderId, messageText);
-
-                if(aiResponse.toLowerCase() == 'this is a lead'){
-                    await sendLeadButton(senderId);
+                            if(aiResponse.toLowerCase() == 'this is a lead'){
+                                await sendLeadButton(senderId);
+                            }
+                            else{
+                                await sendMessage(senderId, aiResponse);
+                            }
+                        }
+                        if(value.postback && value.postback.payload){
+                            const senderId = value.sender.id;
+                            const payload = value.postback.payload;
+                            if (payload === 'YES_CONTACT'){
+                              await sendLeadDetailsRequest(senderId);
+                            }
+                            else if (payload === 'NO_CONTACT'){
+                              await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
+                            }
+                        }
+                    }
                 }
-                else{
-                    await sendMessage(senderId, aiResponse);
-                }
-                
             }
-            console.log('Event',event);
-            if(event.postback && event.postback.payload){
-                const senderId = event.sender.id;
-                const payload = event.postback.payload;
-                if (payload === 'YES_CONTACT'){
-                  await sendLeadDetailsRequest(senderId);
-                }
-                else if (payload === 'NO_CONTACT'){
-                  await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
-                }
-              }
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(404);
         }
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(404);
-    }
-    }
-    catch (error) {
-    console.log(error);
-    return res.json({status:"failed", message:`${error}`})
+    } catch (error) {
+        console.error(error);
+        return res.json({ status: "failed", message: error.message });
     }
 };
 
@@ -139,15 +140,13 @@ async function getOpenAIResponse(senderId: string,messageText: string) {
 
   }
 
-  async function sendMessage(senderId: string, message: string) {
-
-    console.log(message);
+  async function sendMessage(recipientId: string, message: string) {
     const requestBody = {
-        recipient: { id: senderId },
+        recipient: { id: recipientId },
         message: { text: message }
     };
 
-    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+    await fetch(`https://graph.facebook.com/v17.0/me/messages?access_token=${process.env.INSTAGRAM_ACCESS_TOKEN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
@@ -175,7 +174,7 @@ async function sendLeadButton(senderId: string){
       }
     };
   
-    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+    await fetch(`https://graph.facebook.com/v17.0/me/messages?access_token=${process.env.INSTAGRAM_ACCESS_TOKEN}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody)
@@ -185,16 +184,16 @@ async function sendLeadButton(senderId: string){
     const  requestBody = {
         recipient: { id: senderId },
         message: {
-            text: `Hello! To better assist you, please provide the following information: \n\n
-                    1. **Full Name**: \n
-                    2. **Case Description**: \n
-                    3. **Phone Number**: \n
-                    4. **Email Address**: \n\n
-                    Please reply with the requested information, and we will get in touch with you as soon as possible.`
+            text: "Hello! To better assist you, please provide the following information: \n\n" +
+                    "1. **Full Name**: \n" +
+                    "2. **Case Description**: \n" +
+                    "3. **Phone Number**: \n" +
+                    "4. **Email Address**: \n\n" +
+                    "Please reply with the requested information, and we will get in touch with you as soon as possible."
         }
     };
   
-    await fetch(`https://graph.facebook.com/v12.0/me/messages?access_token=${process.env.MESSENGER_ACCESS_TOKEN}`, {
+    await fetch(`https://graph.facebook.com/v17.0/me/messages?access_token=${process.env.INSTAGRAM_ACCESS_TOKEN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)

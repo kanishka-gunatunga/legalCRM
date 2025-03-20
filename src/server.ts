@@ -78,6 +78,7 @@ import { chatAudioResponse } from "./controllers/chatControllerAudio";
 import multer from "multer";
 import { chatTranscribeAudio } from "./controllers/TranscribeAudio";
 import { verifyWebhook,sendReply} from "./controllers/messengerChat";
+import { verifyWebhookInsta,sendReplyInsta} from "./controllers/instagramChat";
 import { chatResponseTrigger } from "./controllers/botTrigger";
 
 const app = express();
@@ -430,6 +431,9 @@ app.post("/refresh-live-chat-inner", refreshLiveChatInner);
 
 app.get("/messenger-webhook", verifyWebhook);
 app.post("/messenger-webhook", sendReply);
+
+app.get("/instagram-webhook", verifyWebhookInsta);
+app.post("/instagram-webhook", sendReplyInsta);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
