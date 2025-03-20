@@ -43,33 +43,56 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
   if (body.object === "page") {
       for (const entry of body.entry) {
           const event = entry.messaging[0];
-
           if (event.message && event.message.text) {
-              const senderId = event.sender.id;
-              const messageText = event.message.text;
+            const senderId = event.sender.id;
+            const messageText = event.message.text;
 
-              let aiResponse = await getOpenAIResponse(senderId, messageText);
+            if (event.message.quick_reply && event.message.quick_reply.payload) {
+                const payload = event.message.quick_reply.payload;
+                console.log("Quick reply payload:", payload);
 
-              if(aiResponse.toLowerCase() == 'this is a lead'|| aiResponse.toLowerCase() == 'this is a lead.'){
-                  await sendLeadButton(senderId);
-              }
-              else{
-                  await sendMessage(senderId, aiResponse);
-              }
-              
-          }
-          console.log('Event',event);
-          if(event.postback && event.postback.payload){
-              const senderId = event.sender.id;
-              const payload = event.postback.payload;
-              console.log("Postback payload:", payload); 
-              if (payload === 'YES_CONTACT'){
-                await sendLeadDetailsRequest(senderId);
-              }
-              else if (payload === 'NO_CONTACT'){
-                await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
-              }
+                if (payload === 'YES_CONTACT') {
+                    await sendLeadDetailsRequest(senderId);
+                } else if (payload === 'NO_CONTACT') {
+                    await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
+                }
+            } else {
+                let aiResponse = await getOpenAIResponse(senderId, messageText);
+
+                if (aiResponse.toLowerCase() == 'this is a lead') {
+                    await sendLeadButton(senderId);
+                } else {
+                    await sendMessage(senderId, aiResponse);
+                }
             }
+        }
+        console.log('Event', event);
+          // if (event.message && event.message.text) {
+          //     const senderId = event.sender.id;
+          //     const messageText = event.message.text;
+
+          //     let aiResponse = await getOpenAIResponse(senderId, messageText);
+
+          //     if(aiResponse.toLowerCase() == 'this is a lead'|| aiResponse.toLowerCase() == 'this is a lead.'){
+          //         await sendLeadButton(senderId);
+          //     }
+          //     else{
+          //         await sendMessage(senderId, aiResponse);
+          //     }
+              
+          // }
+          // console.log('Event',event);
+          // if(event.postback && event.postback.payload){
+          //     const senderId = event.sender.id;
+          //     const payload = event.postback.payload;
+          //     console.log("Postback payload:", payload); 
+          //     if (payload === 'YES_CONTACT'){
+          //       await sendLeadDetailsRequest(senderId);
+          //     }
+          //     else if (payload === 'NO_CONTACT'){
+          //       await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
+          //     }
+          //   }
       }
       res.sendStatus(200);
   } else {
