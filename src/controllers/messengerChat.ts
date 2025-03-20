@@ -38,47 +38,48 @@ export const verifyWebhook = async (req: Request, res: Response, next: NextFunct
 };
 
 export const sendReply = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-    const body = req.body;
-    if (body.object === "page") {
-        for (const entry of body.entry) {
-            const event = entry.messaging[0];
+  try {
+  const body = req.body;
+  if (body.object === "page") {
+      for (const entry of body.entry) {
+          const event = entry.messaging[0];
 
-            if (event.message && event.message.text) {
-                const senderId = event.sender.id;
-                const messageText = event.message.text;
+          if (event.message && event.message.text) {
+              const senderId = event.sender.id;
+              const messageText = event.message.text;
 
-                let aiResponse = await getOpenAIResponse(senderId, messageText);
+              let aiResponse = await getOpenAIResponse(senderId, messageText);
 
-                if(aiResponse.toLowerCase() == 'this is a lead'){
-                    await sendLeadButton(senderId);
-                }
-                else{
-                    await sendMessage(senderId, aiResponse);
-                }
-                
-            }
-            console.log('Event',event);
-            if(event.postback && event.postback.payload){
-                const senderId = event.sender.id;
-                const payload = event.postback.payload;
-                if (payload === 'YES_CONTACT'){
-                  await sendLeadDetailsRequest(senderId);
-                }
-                else if (payload === 'NO_CONTACT'){
-                  await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
-                }
+              if(aiResponse.toLowerCase() == 'this is a lead'){
+                  await sendLeadButton(senderId);
               }
-        }
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(404);
-    }
-    }
-    catch (error) {
-    console.log(error);
-    return res.json({status:"failed", message:`${error}`})
-    }
+              else{
+                  await sendMessage(senderId, aiResponse);
+              }
+              
+          }
+          console.log('Event',event);
+          if(event.postback && event.postback.payload){
+              const senderId = event.sender.id;
+              const payload = event.postback.payload;
+              console.log("Postback payload:", payload); 
+              if (payload === 'YES_CONTACT'){
+                await sendLeadDetailsRequest(senderId);
+              }
+              else if (payload === 'NO_CONTACT'){
+                await sendMessage(senderId, "Okay, if you have further questions, feel free to ask!");
+              }
+            }
+      }
+      res.sendStatus(200);
+  } else {
+      res.sendStatus(404);
+  }
+  }
+  catch (error) {
+  console.log(error);
+  return res.json({status:"failed", message:`${error}`})
+  }
 };
 
 async function getOpenAIResponse(senderId: string,messageText: string) {
