@@ -50,7 +50,7 @@ export const sendReply = async (req: Request, res: Response, next: NextFunction)
 
               let aiResponse = await getOpenAIResponse(senderId, messageText);
 
-              if(aiResponse.toLowerCase() == 'this is a lead'){
+              if(aiResponse.toLowerCase() == 'this is a lead'|| aiResponse.toLowerCase() == 'this is a lead.'){
                   await sendLeadButton(senderId);
               }
               else{
