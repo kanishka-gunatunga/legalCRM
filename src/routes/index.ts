@@ -27,4 +27,7 @@ router.get('/voice-and-chat-bot', async (req: Request, res: Response) => {
     res.render('index',{questions: questions});
 });
 
+router.get('/connect-facebook', (req: Request, res: Response) => {
+    res.render('connect-facebook');
+});
 export default router;
