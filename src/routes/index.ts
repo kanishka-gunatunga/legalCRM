@@ -28,8 +28,8 @@ router.get('/voice-and-chat-bot', async (req: Request, res: Response) => {
 });
 
 router.get('/connect-facebook', (req: Request, res: Response) => {
-    const FACEBOOK_APP_ID = "your-app-id";
-    const REDIRECT_URI = "https://yourdomain.com/auth/callback";
+    const FACEBOOK_APP_ID = "413295051459868";
+    const REDIRECT_URI = "https://legal-crm.vercel.app/auth/callback";
     const SCOPES = "pages_show_list,pages_manage_metadata,pages_messaging";
 
     const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPES}&response_type=code`;
