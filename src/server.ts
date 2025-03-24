@@ -433,7 +433,7 @@ app.get("/messenger-webhook", verifyWebhook);
 app.post("/messenger-webhook", sendReply);
 
 app.get("/instagram-webhook", verifyWebhookInsta);
-app.post("/instagram-webhook", sendReplyInsta);
+app.post("/instagram-webhook", sendReplyInsta); 
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
