@@ -48,11 +48,112 @@ router.get('/terms-of-service', (req: Request, res: Response) => {
     res.render('terms-of-service');
 });
 
-router.get("/auth/callback", async (req, res) => {
+// router.get("/auth/callback", async (req, res) => {
 
+//     const FACEBOOK_APP_ID = "413295051459868";
+//     const FACEBOOK_APP_SECRET = "d8f0b4f332f3a31464e5a64985ae7dfc";
+//     const REDIRECT_URI = "https://legal-crm.vercel.app/auth/callback";
+//     const code = req.query.code;
+//     if (!code) return res.send("Authorization failed.");
+
+//     try {
+
+//         const tokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+//             params: {
+//                 client_id: FACEBOOK_APP_ID,
+//                 client_secret: FACEBOOK_APP_SECRET,
+//                 redirect_uri: REDIRECT_URI,
+//                 code,
+//             },
+//         });
+
+//         const userAccessToken = tokenResponse.data.access_token;
+
+//         const longLivedTokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+//             params: {
+//                 grant_type: "fb_exchange_token",
+//                 client_id: FACEBOOK_APP_ID,
+//                 client_secret: FACEBOOK_APP_SECRET,
+//                 fb_exchange_token: userAccessToken,
+//             },
+//         });
+
+//         const longLivedUserToken = longLivedTokenResponse.data.access_token;
+//         const pagesResponse = await axios.get(`https://graph.facebook.com/v18.0/me/accounts`, {
+//             headers: { Authorization: `Bearer ${longLivedUserToken}` },
+//         });
+
+//         const pages = pagesResponse.data.data;
+
+//         res.render("select-page", { pages, userAccessToken: longLivedUserToken });
+//     } catch (error) {
+//         console.error("Error during authentication:", error.response?.data || error.message);
+//         res.send("Authentication failed.");
+//     }
+// });
+router.get("/auth/callback", async (req, res) => {
     const FACEBOOK_APP_ID = "413295051459868";
     const FACEBOOK_APP_SECRET = "d8f0b4f332f3a31464e5a64985ae7dfc";
     const REDIRECT_URI = "https://legal-crm.vercel.app/auth/callback";
+    const code = req.query.code;
+    if (!code) return res.send("Authorization failed.");
+
+    try {
+        const tokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+            params: {
+                client_id: FACEBOOK_APP_ID,
+                client_secret: FACEBOOK_APP_SECRET,
+                redirect_uri: REDIRECT_URI,
+                code,
+            },
+        });
+
+        const userAccessToken = tokenResponse.data.access_token;
+
+        const pagesResponse = await axios.get(`https://graph.facebook.com/v18.0/me/accounts`, {
+            headers: { Authorization: `Bearer ${userAccessToken}` },
+        });
+
+        const pages = pagesResponse.data.data;
+
+        if (!pages || pages.length === 0) {
+            return res.send("No pages found.");
+        }
+
+        const selectedPage = pages[0]; 
+        const selectedPageToken = selectedPage.access_token;
+        const selectedPageId = selectedPage.id;
+
+        await axios.post(`https://graph.facebook.com/v18.0/${selectedPageId}/subscribed_apps`, null, {
+            params: { access_token: selectedPageToken },
+        });
+
+
+        console.log("Auto-Connected to Page:", selectedPage.name);
+
+        res.send(`Connected to page: ${selectedPage.name}`);
+    } catch (error) {
+        console.error("Error:", error.response?.data || error.message);
+        res.send("Failed to connect.");
+    }
+});
+
+
+router.get('/connect-instagram', (req: Request, res: Response) => {
+    const FACEBOOK_APP_ID = "413295051459868";
+    const REDIRECT_URI = "https://legal-crm.vercel.app/auth/instagram/callback";
+    const SCOPES = "instagram_basic,instagram_manage_messages,pages_show_list,pages_manage_metadata";
+
+    const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPES}&response_type=code`;
+
+    res.render("connect-instagram", { loginUrl });
+});
+
+
+router.get("/auth/instagram/callback", async (req, res) => {
+    const FACEBOOK_APP_ID = "413295051459868";
+    const FACEBOOK_APP_SECRET = "d8f0b4f332f3a31464e5a64985ae7dfc";
+    const REDIRECT_URI = "https://legal-crm.vercel.app/auth/instagram/callback";
     const code = req.query.code;
     if (!code) return res.send("Authorization failed.");
 
@@ -69,27 +170,40 @@ router.get("/auth/callback", async (req, res) => {
 
         const userAccessToken = tokenResponse.data.access_token;
 
-        const longLivedTokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
-            params: {
-                grant_type: "fb_exchange_token",
-                client_id: FACEBOOK_APP_ID,
-                client_secret: FACEBOOK_APP_SECRET,
-                fb_exchange_token: userAccessToken,
-            },
-        });
-
-        const longLivedUserToken = longLivedTokenResponse.data.access_token;
         const pagesResponse = await axios.get(`https://graph.facebook.com/v18.0/me/accounts`, {
-            headers: { Authorization: `Bearer ${longLivedUserToken}` },
+            headers: { Authorization: `Bearer ${userAccessToken}` },
         });
 
         const pages = pagesResponse.data.data;
 
-        res.render("select-page", { pages, userAccessToken: longLivedUserToken });
+        if (!pages || pages.length === 0) {
+            return res.send("No Instagram Business Accounts found.");
+        }
+
+        const selectedPage = pages[0]; 
+        const pageId = selectedPage.id;
+        const pageAccessToken = selectedPage.access_token;
+
+        const instaResponse = await axios.get(`https://graph.facebook.com/v18.0/${pageId}?fields=instagram_business_account`, {
+            headers: { Authorization: `Bearer ${pageAccessToken}` },
+        });
+
+        const instagramBusinessAccountId = instaResponse.data.instagram_business_account?.id;
+
+        if (!instagramBusinessAccountId) {
+            return res.send("No Instagram Business Account linked to this page.");
+        }
+
+        await axios.post(`https://graph.facebook.com/v18.0/${instagramBusinessAccountId}/subscribed_apps`, null, {
+            params: { access_token: pageAccessToken },
+        });
+
+        console.log("Auto-Connected to Instagram Business Account ID:", instagramBusinessAccountId);
+
+        res.send(`Connected to Instagram Business Account: ${instagramBusinessAccountId}`);
     } catch (error) {
-        console.error("Error during authentication:", error.response?.data || error.message);
-        res.send("Authentication failed.");
+        console.error("Error:", error.response?.data || error.message);
+        res.send("Failed to connect.");
     }
 });
-
 export default router;
