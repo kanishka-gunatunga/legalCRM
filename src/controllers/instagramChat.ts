@@ -29,7 +29,7 @@ export const verifyWebhookInsta = async (req: Request, res: Response, next: Next
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
 
-    if (mode === "subscribe" && token === process.env.MESSENGER_VERIFY_TOKEN) {
+    if (mode === "subscribe" && token === process.env.INSTAGRAM_VERIFY_TOKEN) {
         res.status(200).send(challenge);
     } else {
         res.sendStatus(403);
