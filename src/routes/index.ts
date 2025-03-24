@@ -36,6 +36,17 @@ router.get('/connect-facebook', (req: Request, res: Response) => {
 
     res.render("connect-facebook", { loginUrl });
 });
+router.get('/live-agent', (req: Request, res: Response) => {
+    res.render('liveAgent');
+});
+
+router.get('/privacy-policy', (req: Request, res: Response) => {
+    res.render('privacy-policy');
+});
+router.get('/terms-of-service', (req: Request, res: Response) => {
+    res.render('terms-of-service');
+});
+
 router.post('/auth/facebook/connect', async (req, res) => {
     const { accessToken } = req.body;
 
