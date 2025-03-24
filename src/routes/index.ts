@@ -1,5 +1,6 @@
 // routes/index.ts
 import express, { Request, Response } from 'express';
+import axios from "axios";
 import QuickQuestion from '../../models/QuickQuestion';
 
 const router = express.Router();
@@ -47,50 +48,48 @@ router.get('/terms-of-service', (req: Request, res: Response) => {
     res.render('terms-of-service');
 });
 
-router.post('/auth/facebook/connect', async (req, res) => {
-    const { accessToken } = req.body;
+router.get("/auth/callback", async (req, res) => {
 
-    console.log(accessToken);
-    if (!accessToken) {
-        return res.status(400).json({ error: 'Access token is required.' });
-    }
+    const FACEBOOK_APP_ID = "413295051459868";
+    const FACEBOOK_APP_SECRET = "d8f0b4f332f3a31464e5a64985ae7dfc";
+    const REDIRECT_URI = "https://legal-crm.vercel.app/auth/callback";
+    const code = req.query.code;
+    if (!code) return res.send("Authorization failed.");
 
     try {
-        // // Get user's pages
-        // const pagesResponse = await axios.get(
-        //     `https://graph.facebook.com/me/accounts?access_token=${accessToken}`
-        // );
 
-        // const pages = pagesResponse.data.data;
+        const tokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+            params: {
+                client_id: FACEBOOK_APP_ID,
+                client_secret: FACEBOOK_APP_SECRET,
+                redirect_uri: REDIRECT_URI,
+                code,
+            },
+        });
 
-        // if (pages.length === 0) {
-        //     return res.status(400).json({ error: 'No pages found.' });
-        // }
+        const userAccessToken = tokenResponse.data.access_token;
 
-        // // Select the first page (or implement page selection logic)
-        // const pageId = pages[0].id;
+        const longLivedTokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+            params: {
+                grant_type: "fb_exchange_token",
+                client_id: FACEBOOK_APP_ID,
+                client_secret: FACEBOOK_APP_SECRET,
+                fb_exchange_token: userAccessToken,
+            },
+        });
 
-        // // Get the page access token
-        // const pageAccessTokenResponse = await axios.get(
-        //     `https://graph.facebook.com/<span class="math-inline">\{pageId\}?fields\=access\_token&access\_token\=</span>{accessToken}`
-        // );
+        const longLivedUserToken = longLivedTokenResponse.data.access_token;
+        const pagesResponse = await axios.get(`https://graph.facebook.com/v18.0/me/accounts`, {
+            headers: { Authorization: `Bearer ${longLivedUserToken}` },
+        });
 
-        // const pageAccessToken = pageAccessTokenResponse.data.access_token;
+        const pages = pagesResponse.data.data;
 
-        // // Store pageAccessToken and user ID securely (e.g., in a database)
-        // // Example:
-        // // database.storePageAccessToken(pageId, pageAccessToken, userId);
-
-        // // Create a JWT token
-        // const token = jwt.sign(
-        //     { pageId: pageId, pageAccessToken: pageAccessToken },
-        //     process.env.JWT_SECRET
-        // );
-
-        res.json({ message: 'Facebook connected successfully!', token: accessToken });
+        res.render("select-page", { pages, userAccessToken: longLivedUserToken });
     } catch (error) {
-        console.error('Error connecting Facebook:', error);
-        res.status(500).json({ error: 'Failed to connect Facebook.' });
+        console.error("Error during authentication:", error.response?.data || error.message);
+        res.send("Authentication failed.");
     }
 });
+
 export default router;

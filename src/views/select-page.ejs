@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Facebook Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .page-card { padding: 10px; border: 1px solid #ccc; margin: 10px; border-radius: 5px; }
+        button { background-color: #1877F2; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Select Your Facebook Page</h2>
+    <p>Choose the page you want to connect to the chatbot.</p>
+
+    <div class="container">
+        <form action="/save-page-token" method="POST">
+            <% pages.forEach(page => { %>
+                <div class="page-card">
+                    <h3><%= page.name %></h3>
+                    <p>Page ID: <%= page.id %></p>
+                    <input type="radio" name="page_id" value="<%= page.id %>" required>
+                    <input type="hidden" name="page_access_token_<%= page.id %>" value="<%= page.access_token %>">
+                </div>
+            <% }) %>
+            <br>
+            <input type="hidden" name="user_access_token" value="<%= userAccessToken %>">
+            <button type="submit">Connect Selected Page</button>
+        </form>
+    </div>
+</body>
+</html>
