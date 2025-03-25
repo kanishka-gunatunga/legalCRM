@@ -129,7 +129,7 @@ router.post("/subscribe-page", async (req: Request, res: Response) => {
   });
   router.get("/connect-instagram", (req: Request, res: Response) => {
     const SCOPES = "instagram_business_basic,instagram_business_manage_messages,pages_show_list,pages_manage_metadata"; // Corrected scopes
-    const loginUrl = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(
+    const loginUrl = `https://instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(
         INSTAGRAM_REDIRECT_URI
     )}&scope=${SCOPES}&response_type=code`;
 
