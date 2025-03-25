@@ -88,7 +88,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
 
         // console.log("Auto-Connected to Page:", selectedPage.name);
 
-        // res.send(`Connected to page: ${selectedPage.name}`);
+         res.send(`selectedPages ${pages}`);
     } catch (error) {
         console.error("Error:", error.response?.data || error.message);
         res.send("Failed to connect.");
