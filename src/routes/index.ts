@@ -91,6 +91,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
          res.send(`selectedPages ${pages}`);
     } catch (error) {
         console.error("Error:", error.response?.data || error.message);
+        console.error("Error:", error);
         res.send("Failed to connect.");
     }
 });
