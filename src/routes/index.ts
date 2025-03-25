@@ -32,10 +32,11 @@ router.get('/voice-and-chat-bot', async (req: Request, res: Response) => {
     res.render('index',{questions: questions});
 });
 
-router.get('/connect-facebook', (req: Request, res: Response) => {
-    const SCOPES = "pages_show_list,pages_manage_metadata,pages_messaging";
-
-    const loginUrl = `https://www.facebook.com/v22.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${encodeURIComponent(FB_REDIRECT_URI)}&scope=${SCOPES}&response_type=code`;
+router.get("/connect-facebook", (req: Request, res: Response) => {
+    const SCOPES = "pages_show_list,pages_manage_metadata,pages_read_engagement,pages_read_user_content";
+    const loginUrl = `https://www.facebook.com/v22.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${encodeURIComponent(
+        FB_REDIRECT_URI
+    )}&scope=${SCOPES}&response_type=code`;
 
     res.render("connect-facebook", { loginUrl });
 });
@@ -67,6 +68,14 @@ router.get("/auth/facebook/callback", async (req, res) => {
         // return res.json(tokenResponse.data);
         const userAccessToken = tokenResponse.data.access_token;
         console.log("userAccessToken", userAccessToken);
+
+        const permissionsResponse = await axios.get(`https://graph.facebook.com/v22.0/me/permissions`, {
+            headers: { Authorization: `Bearer ${userAccessToken}` },
+        });
+        console.log("User Permissions:", permissionsResponse.data);
+
+        return res.json(permissionsResponse.data);
+
         const pagesResponse = await axios.get(`https://graph.facebook.com/v22.0/me/accounts`, {
             headers: { Authorization: `Bearer ${userAccessToken}` },
         });
