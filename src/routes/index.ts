@@ -64,13 +64,13 @@ router.get("/auth/facebook/callback", async (req, res) => {
             },
         });
 
-        return res.json(tokenResponse.data);
+        // return res.json(tokenResponse.data);
         const userAccessToken = tokenResponse.data.access_token;
         console.log("userAccessToken", userAccessToken);
         const pagesResponse = await axios.get(`https://graph.facebook.com/v22.0/me/accounts`, {
             headers: { Authorization: `Bearer ${userAccessToken}` },
         });
-
+        return res.json(pagesResponse.data);
         const pages = pagesResponse.data.data;
 
         if (!pages || pages.length === 0) {
