@@ -65,7 +65,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
             },
         });
 
-        return res.json(tokenResponse.data.access_token);
+        // return res.json(tokenResponse.data);
         const userAccessToken = tokenResponse.data.access_token;
         console.log("userAccessToken", userAccessToken);
 
@@ -74,7 +74,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
         });
         console.log("User Permissions:", permissionsResponse.data);
 
-        // return res.json(permissionsResponse.data);
+        return res.json(permissionsResponse.data);
 
         const pagesResponse = await axios.get(`https://graph.facebook.com/v22.0/me/accounts`, {
             headers: { Authorization: `Bearer ${userAccessToken}` },
