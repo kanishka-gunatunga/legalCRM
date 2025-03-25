@@ -8,6 +8,9 @@ const FB_APP_ID = process.env.FB_APP_ID!;
 const FB_APP_SECRET = process.env.FB_APP_SECRET!;
 const FB_REDIRECT_URI = process.env.FB_REDIRECT_URI!;
 const FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN!;
+const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI!;
+const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID!;
+const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET!;
 
 router.get('/', (req: Request, res: Response) => {
     res.render('intergratedBot');
@@ -79,7 +82,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
         const pagesResponse = await axios.get(`https://graph.facebook.com/v22.0/me/accounts`, {
             headers: { Authorization: `Bearer ${userAccessToken}` },
         });
-        return res.json(pagesResponse.data);
+        // return res.json(pagesResponse.data);
         const pages = pagesResponse.data.data;
 
         if (!pages || pages.length === 0) {
@@ -106,16 +109,33 @@ router.get("/auth/facebook/callback", async (req, res) => {
     }
 });
 
-
-router.get('/connect-instagram', (req: Request, res: Response) => {
-    const FACEBOOK_APP_ID = "413295051459868";
-    const REDIRECT_URI = "https://legal-crm.vercel.app/auth/instagram/callback";
-    const SCOPES = "instagram_basic,instagram_manage_messages,pages_show_list,pages_manage_metadata";
-
-    const loginUrl = `https://www.facebook.com/v22.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPES}&response_type=code`;
+router.post("/subscribe-page", async (req: Request, res: Response) => {
+    const { pageId, accessToken } = req.body;
+  
+    if (!pageId || !accessToken) {
+      return res.status(400).send("Missing pageId or accessToken");
+    }
+  
+    try {
+      await axios.post(`https://graph.facebook.com/v19.0/${pageId}/subscribed_apps`, null, {
+        params: { access_token: accessToken },
+      });
+  
+      res.json({ message: `Page ${pageId} subscribed successfully!` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error subscribing page");
+    }
+  });
+  router.get("/connect-instagram", (req: Request, res: Response) => {
+    const SCOPES = "instagram_basic,pages_show_list,pages_manage_metadata";  // Scopes for Instagram login
+    const loginUrl = `https://api.instagram.com/oauth/authorize?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(
+        INSTAGRAM_REDIRECT_URI
+    )}&scope=${SCOPES}&response_type=code`;
 
     res.render("connect-instagram", { loginUrl });
 });
+
 
 
 router.get("/auth/instagram/callback", async (req, res) => {
