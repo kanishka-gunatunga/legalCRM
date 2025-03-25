@@ -65,7 +65,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
             },
         });
 
-        // return res.json(tokenResponse.data);
+        return res.json(tokenResponse.data.access_token);
         const userAccessToken = tokenResponse.data.access_token;
         console.log("userAccessToken", userAccessToken);
 
