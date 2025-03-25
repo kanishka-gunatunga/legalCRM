@@ -53,7 +53,7 @@ router.get('/terms-of-service', (req: Request, res: Response) => {
 router.get("/auth/facebook/callback", async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send("Authorization failed.");
-    console.log("code", code);
+    return res.send(code);
     try {
         const tokenResponse = await axios.get(`https://graph.facebook.com/v22.0/oauth/access_token`, {
             params: {
