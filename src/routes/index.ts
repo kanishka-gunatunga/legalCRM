@@ -53,7 +53,7 @@ router.get('/terms-of-service', (req: Request, res: Response) => {
 router.get("/auth/facebook/callback", async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send("Authorization failed.");
-    return res.send(code);
+    // return res.send(code);
     try {
         const tokenResponse = await axios.get(`https://graph.facebook.com/v22.0/oauth/access_token`, {
             params: {
@@ -64,6 +64,7 @@ router.get("/auth/facebook/callback", async (req, res) => {
             },
         });
 
+        return res.send(tokenResponse);
         const userAccessToken = tokenResponse.data.access_token;
         console.log("userAccessToken", userAccessToken);
         const pagesResponse = await axios.get(`https://graph.facebook.com/v22.0/me/accounts`, {
