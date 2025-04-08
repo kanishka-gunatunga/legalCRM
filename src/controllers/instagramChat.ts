@@ -77,8 +77,8 @@ export const sendReplyInsta = async (req: Request, res: Response, next: NextFunc
             res.sendStatus(404);
         }
     } catch (error) {
-        console.error(error);
-        return res.json({ status: "failed", message: error.message });
+        // console.error(error);
+        return res.json({ status: "failed", message: error });
     }
 };
 

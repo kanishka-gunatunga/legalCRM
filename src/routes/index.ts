@@ -103,8 +103,8 @@ router.get("/auth/facebook/callback", async (req, res) => {
 
          res.send(`selectedPages ${pages}`);
     } catch (error) {
-        console.error("Error:", error.response?.data || error.message);
-        console.error("Error:", error); 
+        // console.error("Error:", error.response?.data || error.message);
+        // console.error("Error:", error); 
         res.send("Failed to connect.");
     }
 });
@@ -123,7 +123,7 @@ router.post("/subscribe-page", async (req: Request, res: Response) => {
   
       res.json({ message: `Page ${pageId} subscribed successfully!` });
     } catch (error) {
-      console.error(error);
+    //   console.error(error);
       res.status(500).send("Error subscribing page");
     }
   });
@@ -195,7 +195,7 @@ router.get("/auth/instagram/callback", async (req, res) => {
         //     res.send("Instagram Business Account not found for the selected page.");
         // }
     } catch (error) {
-        console.error("Error:", error.response?.data || error.message);
+        // console.error("Error:", error.response?.data || error.message);
         res.send("Failed to connect Instagram.");
     }
 });
@@ -208,7 +208,7 @@ async function subscribeInstagramToChatbot(instagramAccountId: string, pageAcces
         console.log(`Instagram Account ${instagramAccountId} subscribed to chatbot.`);
         return response.data;
     } catch (error) {
-        console.error("Error subscribing Instagram account:", error.response?.data || error.message);
+        // console.error("Error subscribing Instagram account:", error.response?.data || error.message);
         throw new Error("Failed to subscribe Instagram account.");
     }
 }
