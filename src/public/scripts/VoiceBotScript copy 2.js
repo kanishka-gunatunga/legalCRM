@@ -10,8 +10,7 @@ let agentJoined = false;
 let chatStatus = "bot";
 let clientDetailsSubmitStatus = false;
 
-let userData = {};
-let onLoadPage = true;
+
 
 
 
@@ -38,7 +37,6 @@ function setFormattedOpenedTime() {
   )}:${Openedminutes} ${Openedampm}`;
 
   document.getElementById("OpenedTime1").textContent = formattedOpenedTime;
-  // document.getElementById("OpenedTime1Form").textContent = formattedOpenedTime;
 }
 
 // set time - all the visible time manage
@@ -100,7 +98,7 @@ function updatePlaceholder() {
 }
 
 
-window.addEventListener("storage", function (event) {
+window.addEventListener("storage", function(event) {
   if (event.key === "selectedLanguage") {
     updatePlaceholder();
   }
@@ -111,11 +109,10 @@ window.addEventListener("storage", function (event) {
 // Function - handle error messages
 function handleErrorMessage(error) {
   const responseDiv = document.getElementById("response");
-  // const chatLang = sessionStorage.getItem("selectedLanguage");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
+  const chatLang = sessionStorage.getItem("selectedLanguage");
 
   let errorMessage = "<p class='error-message'>The allocated number of tokens are over, please ask the administrator to add more tokens to the system.</p>";
-
+  
   if (chatLang === "Spanish") {
     errorMessage = "<p class='error-message'>El número de tokens asignado ha sido superado, por favor pida al administrador que añada más tokens al sistema.</p>";
   } else if (
@@ -143,15 +140,14 @@ function resetChatTimeout() {
 
 // Alert - handle chat end
 function showEndChatAlert() {
-  // const chatLanguage = sessionStorage.getItem("selectedLanguage");
-  const chatLanguage = sessionStorage.getItem("selectedLanguage") || "Spanish";
-  const messageYes = chatLanguage === "Spanish"
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
+    const messageYes = chatLanguage === "Spanish"
     ? "Sí"
     : "Yes";
-  const messageCancel = chatLanguage === "Spanish"
+    const messageCancel = chatLanguage === "Spanish"
     ? "Cancelar"
     : "Cancel";
-  const messageInactive = chatLanguage === "Spanish"
+    const messageInactive = chatLanguage === "Spanish"
     ? "Parece que no has enviado ningún mensaje durante un tiempo. ¿Quieres finalizar el chat?"
     : "Are you sure you want to close this chat? Do you want to end the chat?";
   if (!endChatAlertShown) {
@@ -181,18 +177,16 @@ function showEndChatAlert() {
 
 // Alert - handle chat end for live agent
 function showEndChatAlertAgent() {
-  // const chatLanguage = sessionStorage.getItem("selectedLanguage");
-  const chatLanguage = sessionStorage.getItem("selectedLanguage") || "Spanish";
-
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
   const messageYes = chatLanguage === "Spanish"
-    ? "Sí"
-    : "Yes";
+  ? "Sí"
+  : "Yes";
   const messageCancel = chatLanguage === "Spanish"
-    ? "Cancelar"
-    : "Cancel";
+  ? "Cancelar"
+  : "Cancel";
   const messageEndChat = chatLanguage === "Spanish"
-    ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
-    : "Are you sure you want to close this chat? Do you want to end the chat?";
+  ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
+  : "Are you sure you want to close this chat? Do you want to end the chat?";
 
   if (!endChatAlertShown) {
     endChatAlertShown = true;
@@ -221,19 +215,18 @@ function showEndChatAlertAgent() {
 
 // Alert - handle chat end for chat bot
 function showEndChatAlertBot() {
-  // const chatLanguage = sessionStorage.getItem("selectedLanguage");
-  const chatLanguage = sessionStorage.getItem("selectedLanguage") || "Spanish";
-
+  const chatLanguage = sessionStorage.getItem("selectedLanguage");
+ 
   const messageYes = chatLanguage === "Spanish"
-    ? "Sí"
-    : "Yes";
+  ? "Sí"
+  : "Yes";
   const messageCancel = chatLanguage === "Spanish"
-    ? "Cancelar"
-    : "Cancel";
+  ? "Cancelar"
+  : "Cancel";
   const messageEndChat = chatLanguage === "Spanish"
-    ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
-    : "Are you sure you want to close this chat? Do you want to end the chat?";
-
+  ? "¿Estás seguro de que deseas cerrar este chat? ¿Quieres finalizar el chat?"
+  : "Are you sure you want to close this chat? Do you want to end the chat?";
+ 
   if (!endChatAlertShown) {
     endChatAlertShown = true;
 
@@ -247,7 +240,7 @@ function showEndChatAlertBot() {
       "show"
     );
     alertDiv.setAttribute("role", "alert");
-
+    
     alertDiv.innerHTML = `
                 ${messageEndChat}
                 <div class="d-flex flex-row">
@@ -263,25 +256,20 @@ function showEndChatAlertBot() {
 // Function - start rating
 function handleEndChatBot() {
   chatLanguage = sessionStorage.getItem("selectedLanguage");
-  showAlertSuccess("Thank you for chat with us..");
+  showAlertSuccess(messageThanks);
 }
 
 
 // Function - handle ending the chat
 function handleEndChat() {
   clearTimeout(chatTimeoutId);
-  // const chatLang = sessionStorage.getItem("selectedLanguage");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
   const message = chatLang === "Spanish"
     ? "Por favor califique su experiencia de chat:"
     : "Please rate your chat experience:";
   appendMessageToResponse("bot", message, null, true);
 }
-
-
-
-
-
 
 
 // Function - append message to response div
@@ -301,36 +289,7 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
     content.includes("We will provide you with the requested information within the next 24 hours. In the meantime, please provide your contact information so we can contact you if necessary.") ||
     content.includes("The marketing agent will be selected. An expert will contact you within the next 24 hours.")
   ) {
-    const existingData = sessionStorage.getItem("userData");
-
-    if (existingData) {
-      messageDiv.innerHTML = `
-      <div class="messageWrapper">
-        <span class="botname-message">${new Date().toLocaleTimeString()}</span>
-        <div class="d-flex flex-column">
-          ${content}
-          <textarea placeholder="Your message" id="message" class="mb-2 p-1 formLegalCRM"></textarea>
-          <button id="LiveAgentButton" class="liveagentBtn">Submit</button>
-        </div>
-      </div>`;
-
-      const button = messageDiv.querySelector("#LiveAgentButton");
-      button.addEventListener("click", () => {
-        const message = messageDiv.querySelector("#message").value;
-        const parsedUserData = JSON.parse(existingData);
-
-        sessionStorage.setItem("leadData", JSON.stringify({
-          ...parsedUserData,
-          description: message,
-        }));
-
-       sendLeadDataToAPI();
-
-        
-      });
-    } else {
-      fillAllDataForm(messageDiv, content, data);
-    }
+    appendLiveAgentContent(messageDiv, content, data);
   } else {
     appendPlainTextContent(messageDiv, content);
   }
@@ -407,38 +366,17 @@ function appendListContent(messageDiv, content) {
 // ===============================================
 // ================ lead submission to CRM =======================
 // ===============================================
-// function handleLiveAgentButtonClick(formId, data) {
-//   const formElement = document.getElementById(formId);
-//   const name = formElement.querySelector("#title").value.trim();
-//   const phone = formElement.querySelector("#phone").value.trim();
-//   const email = formElement.querySelector("#email").value.trim();
-//   const message = formElement.querySelector("#message").value.trim();
-
-//   const userData = {
-//     name,
-//     phone,
-//     email,
-//     message,
-//   };
-
-//   sessionStorage.setItem("userData", JSON.stringify(userData));
-
-//   console.log("User data saved:", userData);
-// }
-
-function fillAllDataForm(messageDiv, content, data) {
+function appendLiveAgentContent(messageDiv, content, data) {
   const formattedTime = new Date().toLocaleTimeString();
   const formId = `form-${Math.random().toString(36).substr(2, 9)}`;
-  // const chatLang = sessionStorage.getItem("selectedLanguage");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
-
+  const chatLang = sessionStorage.getItem("selectedLanguage");
 
   const namePlaceholder = chatLang === "Spanish" ? "Su nombre" : "Your name";
   const phonePlaceholder = chatLang === "Spanish" ? "Número de teléfono" : "Phone number";
   const emailPlaceholder = chatLang === "Spanish" ? "Dirección de correo electrónico" : "Email address";
   const messagePlaceholder = chatLang === "Spanish" ? "Mensaje" : "Message";
-  const privacyPolicyLabel = chatLang === "Spanish"
-    ? "He leído y acepto la Política de privacidad y los Términos y condiciones."
+  const privacyPolicyLabel = chatLang === "Spanish" 
+    ? "He leído y acepto la Política de privacidad y los Términos y condiciones." 
     : "I have read and accept the Privacy Policy and Terms and Conditions.";
   const buttonLabel = chatLang === "Spanish" ? "Entregar" : "Submit";
 
@@ -469,118 +407,12 @@ function fillAllDataForm(messageDiv, content, data) {
 
   liveAgentButton.addEventListener("click", () => {
     handleLiveAgentButtonClick(formId, data);
-    console.log("trigger : ", data)
-   sendLeadDataToAPI();
-  });
-}
-
-function fillAllDataFormOnLoad(messageDiv, content, data) {
-  const formattedTime = new Date().toLocaleTimeString();
-  const formId = `form-${Math.random().toString(36).substr(2, 9)}`;
-  // const chatLang = sessionStorage.getItem("selectedLanguage");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
-
-  const namePlaceholder = chatLang === "Spanish" ? "Su nombre" : "Your name";
-  const phonePlaceholder = chatLang === "Spanish" ? "Número de teléfono" : "Phone number";
-  const emailPlaceholder = chatLang === "Spanish" ? "Dirección de correo electrónico" : "Email address";
-  const privacyPolicyLabel = chatLang === "Spanish"
-    ? "He leído y acepto la Política de privacidad y los Términos y condiciones."
-    : "I have read and accept the Privacy Policy and Terms and Conditions.";
-  const buttonLabel = chatLang === "Spanish" ? "Entregar" : "Submit";
-
-  messageDiv.innerHTML = `
-  <div class="bot-message">
-    <img class="message-image" src="/agent.png">
-    <div class="messageWrapper">
-      <span class="botname-message">${formattedTime}</span>
-      <div class="d-flex flex-column" id="${formId}">
-        <div class="px-0">${content}</div>
-        <input type="text" placeholder="${namePlaceholder}" id="title" class="mb-2 p-1 formLegalCRM">
-        <input type="tel" placeholder="${phonePlaceholder}" id="phone" class="mb-2 p-1 formLegalCRM">
-        <input type="email" placeholder="${emailPlaceholder}" id="email" class="mb-2 p-1 formLegalCRM">
-
-        <div class="mb-2 px-0 d-flex flex-row align-items-start">
-          <input type="checkbox" id="privacyPolicyCheckbox" style="margin-right: 10px; margin-top: 3px;">
-          <label for="privacyPolicyCheckbox">${privacyPolicyLabel}</label>
-        </div>
-        
-        <button id="LiveAgentButton" class="liveagentBtn" disabled>${buttonLabel}</button>
-      </div>
-    </div>
-  </div>
-  `;
-
-  const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
-  const privacyCheckbox = messageDiv.querySelector("#privacyPolicyCheckbox");
-
-
-  const phonePattern = /^[0-9]{10}$/;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-  function validateForm() {
-    const title = messageDiv.querySelector("#title").value;
-    const phone = messageDiv.querySelector("#phone").value;
-    const email = messageDiv.querySelector("#email").value;
-    const isPrivacyChecked = privacyCheckbox.checked;
-
-    let valid = true;
-    let errorMessage = "";
-
-    if (!title.trim()) {
-      errorMessage = chatLang === "Spanish" ? "El nombre es obligatorio." : "Title is required.";
-      valid = false;
-    }
-
-    else if (!phonePattern.test(phone)) {
-      errorMessage = chatLang === "Spanish" ? "Por favor ingrese un número de teléfono válido (10 dígitos)." : "Please enter a valid phone number (10 digits).";
-      valid = false;
-    }
-
-    else if (!emailPattern.test(email)) {
-      errorMessage = chatLang === "Spanish" ? "Por favor ingrese una dirección de correo electrónico válida." : "Please enter a valid email address.";
-      valid = false;
-    }
-
-    else if (!isPrivacyChecked) {
-      errorMessage = chatLang === "Spanish" ? "Debe aceptar la Política de privacidad y los Términos y condiciones." : "You must accept the Privacy Policy and Terms and Conditions.";
-      valid = false;
-    }
-
-    if (!valid) {
-      showAlert(errorMessage);
-    }
-
-    return valid;
-  }
-
-
-  privacyCheckbox.addEventListener("change", () => {
-    liveAgentButton.disabled = !privacyCheckbox.checked;
-  });
-
-  liveAgentButton.addEventListener("click", () => {
-    if (validateForm()) {
-      const title = messageDiv.querySelector("#title").value;
-      const phone = messageDiv.querySelector("#phone").value;
-      const email = messageDiv.querySelector("#email").value;
-
-      sessionStorage.setItem("userData", JSON.stringify({ title, phone, email }));
-
-      showAlertSuccess(chatLang === "Spanish" ? "Datos guardados correctamente." : "Details saved successfully.");
-    }
   });
 }
 
 
-
-
-// ===============================================
-// ================ handle form submit =======================
-// ===============================================
-function handleLiveAgentButtonClick(formId) {
+async function handleLiveAgentButtonClick(formId, data) {
   console.log("Form ID in handler:", formId);
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
 
   const form = document.getElementById(formId);
   if (!form) {
@@ -592,60 +424,49 @@ function handleLiveAgentButtonClick(formId) {
   const phone = form.querySelector("#phone").value;
   const email = form.querySelector("#email").value;
   const description = form.querySelector("#message").value;
-
-  sessionStorage.setItem("leadData", JSON.stringify({
-    title,
-    phone,
-    email,
-    description
-  }));
-  sessionStorage.setItem("userData", JSON.stringify({ title, phone, email }));
-
-  // showAlertSuccess(chatLang === "Spanish" ? "Datos guardados correctamente." : "Details saved successfully.");
-
-}
-
-
-async function sendLeadDataToAPI() {
-  const leadData = JSON.parse(sessionStorage.getItem("leadData"));
-  // const chatLang = sessionStorage.getItem("selectedLanguage");
-  const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
   const leadValue = 0;
 
   const phonePattern = /^[0-9]{10}$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const phoneErrorMessage = chatLang === "Spanish"
-    ? "Por favor ingrese un número de teléfono válido (10 dígitos)."
+  const chatLang = sessionStorage.getItem("selectedLanguage");
+
+
+  const phoneErrorMessage = chatLang === "Spanish" 
+    ? "Por favor ingrese un número de teléfono válido (10 dígitos)." 
     : "Please enter a valid phone number (10 digits).";
-
-  const emailErrorMessage = chatLang === "Spanish"
-    ? "Por favor ingrese una dirección de correo electrónico válida."
+    
+  const emailErrorMessage = chatLang === "Spanish" 
+    ? "Por favor ingrese una dirección de correo electrónico válida." 
     : "Please enter a valid email address.";
-
-  const successMessage = chatLang === "Spanish"
-    ? "¡Prospecto creado exitosamente!"
+    
+  const successMessage = chatLang === "Spanish" 
+    ? "¡Prospecto creado exitosamente!" 
     : "Prospect created successfully!";
-
-  const genericErrorMessage = chatLang === "Spanish"
-    ? "Ocurrió un error. Inténtalo de nuevo más tarde."
+  
+  const genericErrorMessage = chatLang === "Spanish" 
+    ? "Ocurrió un error. Inténtalo de nuevo más tarde." 
     : "An error occurred. Please try again later.";
+    
+  
 
-  if (!leadData || !phonePattern.test(leadData.phone)) {
+  if (!phonePattern.test(phone)) {
     showAlert(phoneErrorMessage);
     return;
   }
 
-  if (!emailPattern.test(leadData.email)) {
+  if (!emailPattern.test(email)) {
     showAlert(emailErrorMessage);
     return;
   }
 
   const payload = {
-    ...leadData,
-    lead_value: leadValue
+    title: title,
+    phone: phone,
+    email: email,
+    description: description,
+    lead_value: leadValue,
   };
-
   console.log("Payload to be sent:", payload);
 
   try {
@@ -660,31 +481,30 @@ async function sendLeadDataToAPI() {
     const responseData = await response.json();
     console.log("API response:", responseData);
 
-    if (responseData.status === "success") {
-      clientDetailsSubmitStatus = true;
-      showAlertSuccess(successMessage);
-      clearFormFields();
+    if (response.ok) {
+      clientDetailsSubmitStatus = true
+      showAlert(successMessage);
+      form.querySelector("#title").value = '';
+      form.querySelector("#email").value = '';
+      form.querySelector("#phone").value = '';
+      form.querySelector("#message").value = '';
     } else {
-      const clientCreationErrorMessage = chatLang === "Spanish"
-        ? "Error al crear cliente potencial: " + responseData.message
-        : "Error creating prospect: " + responseData.message;
+      const clientCreationErrorMessage = chatLang === "Spanish" 
+    ? "Error al crear cliente potencial: " + responseData.message 
+    : "Error creating prospect: " + responseData.message;
       showAlert(clientCreationErrorMessage);
     }
   } catch (error) {
     console.error("Error sending lead data:", error);
-    // showAlert(genericErrorMessage);
+    showAlert(genericErrorMessage);
   }
 }
 
-function clearFormFields() {
-  const form = document.querySelector("form");
-  if (form) {
-    form.querySelector("#title").value = '';
-    form.querySelector("#email").value = '';
-    form.querySelector("#phone").value = '';
-    form.querySelector("#message").value = '';
-  }
-}
+{/* <label for="privacyPolicyCheckbox">
+            He leído y acepto la 
+            <a href="https://example.com/privacy-policy" target="_blank">Política de Privacidad</a> y los 
+            <a href="https://example.com/terms-conditions" target="_blank">Términos y Condiciones</a>.
+          </label> */}
 
 
 
@@ -901,11 +721,6 @@ document
     sessionStorage.setItem("selectedLanguage", "English");
     appendLanguageMessage("Please ask your question in English.");
     updatePlaceholder();
-
-    // const messageDiv = document.createElement("div");
-    // document.getElementById("response").appendChild(messageDiv);
-    // const data = {}; 
-    // showFormOnChatLoad(messageDiv, data);
   });
 
 document
@@ -914,11 +729,6 @@ document
     sessionStorage.setItem("selectedLanguage", "Spanish");
     appendLanguageMessage("Por favor haga su pregunta en español.");
     updatePlaceholder();
-
-    // const messageDiv = document.createElement("div");
-    // document.getElementById("response").appendChild(messageDiv);
-    // const data = {};  
-    // showFormOnChatLoad(messageDiv, data);
   });
 
 
@@ -931,179 +741,127 @@ document
 // ================ rating =======================
 // ===============================================
 
-// function appendRatingForm(messageDiv) {
-//   // Language-specific messages
-//   const chatLang = sessionStorage.getItem("selectedLanguage");
+function appendRatingForm(messageDiv) {
+  // Language-specific messages
+  const chatLang = sessionStorage.getItem("selectedLanguage");
 
-//   const ratingPrompt = chatLang === "Spanish"
-//     ? "Por favor califica tu experiencia en el chat:"
-//     : "Please rate your chat experience:";
+  const ratingPrompt = chatLang === "Spanish" 
+    ? "Por favor califica tu experiencia en el chat:"
+    : "Please rate your chat experience:";
 
-//   const submitButtonLabel = chatLang === "Spanish"
-//     ? "Entregar"
-//     : "Submit";
+  const submitButtonLabel = chatLang === "Spanish" 
+    ? "Entregar" 
+    : "Submit";
 
-//   const formattedTime = new Date().toLocaleTimeString();
+  const formattedTime = new Date().toLocaleTimeString();
 
-//   const ratingFormHTML = `
-//     <div class="star-rating-form d-flex flex-column px-2 py-3 mt-3" style="margin-bottom: 10px;">
-//       <label for="rating">Califica tu experiencia:</label>
-//       <div class="rating-icons d-flex flex-row" style="border: none !important;">
-//         <i class="bi bi-star rating-icon"></i>
-//         <i class="bi bi-star rating-icon"></i>
-//         <i class="bi bi-star rating-icon"></i>
-//         <i class="bi bi-star rating-icon"></i>
-//         <i class="bi bi-star rating-icon"></i>
-//       </div>
-//       <input type="hidden" id="rating" name="rating" value="0">
-//       <textarea type="text" id="feedbackMessage" name="feedbackMessage" class="feedbackMessage mb-2"></textarea>
-//       <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">${submitButtonLabel}</button>
-//     </div>
-//   `;
+  const ratingFormHTML = `
+    <div class="star-rating-form d-flex flex-column px-2 py-3 mt-3" style="margin-bottom: 10px;">
+      <label for="rating">Califica tu experiencia:</label>
+      <div class="rating-icons d-flex flex-row" style="border: none !important;">
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+        <i class="bi bi-star rating-icon"></i>
+      </div>
+      <input type="hidden" id="rating" name="rating" value="0">
+      <textarea type="text" id="feedbackMessage" name="feedbackMessage" class="feedbackMessage mb-2"></textarea>
+      <button id="submitRatingButton" class="btnRatingView" onclick="handleRatingSubmission()">${submitButtonLabel}</button>
+    </div>
+  `;
 
-//   messageDiv.innerHTML = `<div class="messageWrapper">
-//       <span class="botname-message">${formattedTime}</span>
-//       <div class="ratingFormTest">
-//         <p class="mb-0">${ratingPrompt}</p>
-//       </div>
-//       ${ratingFormHTML}
-//     </div>`;
+  messageDiv.innerHTML = `<div class="messageWrapper">
+      <span class="botname-message">${formattedTime}</span>
+      <div class="ratingFormTest">
+        <p class="mb-0">${ratingPrompt}</p>
+      </div>
+      ${ratingFormHTML}
+    </div>`;
 
-//   addRatingIconEventListeners(messageDiv);
-// }
-
-
-// function addRatingIconEventListeners(messageDiv) {
-//   const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
-//   ratingIcons.forEach((icon, index) => {
-//     icon.addEventListener("click", handleRatingIconClick(messageDiv, index));
-//   });
-// }
-
-// function handleRatingIconClick(messageDiv, index) {
-//   return function () {
-//     const ratingInput = messageDiv.querySelector("#rating");
-//     ratingInput.value = index + 1;
-//     const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
-//     ratingIcons.forEach((star, i) => {
-//       star.classList.toggle("bi-star-fill", i <= index);
-//     });
-//   };
-// }
-
-// async function handleRatingSubmission() {
-//   const ratingInput = document.getElementById("rating");
-//   const rating = ratingInput.value;
-//   const feedbackMessageInput = document.getElementById("feedbackMessage");
-//   const feedbackMessage = feedbackMessageInput.value;
-//   const chatId = sessionStorage.getItem("chatId");
-
-//   try {
-//     const response = await fetch("/save-rating", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({
-//         ratingValue: rating,
-//         feedbackMessage: feedbackMessage,
-//         chatId: chatId,
-//       }),
-//     });
-
-//     if (response.ok) {
-//       const responseDiv = document.getElementById("response");
-//       const thankYouDiv = document.createElement("div");
-//       thankYouDiv.classList.add(
-//         "alert",
-//         "alert-success",
-//         "alert-dismissible",
-//         "fade",
-//         "show"
-//       );
-//       thankYouDiv.setAttribute("role", "alert");
-//       const thankYouMessage = chatLanguage === "Spanish"
-//         ? "¡Gracias por tus comentarios!"
-//         : "Thank you for your feedback!";
-//       thankYouDiv.textContent = thankYouMessage;
-//       responseDiv.appendChild(thankYouDiv);
-//       thankYouDiv.scrollIntoView({ behavior: "smooth" });
-//     }
-//   } catch (error) {
-//     console.error("Error submitting rating:", error);
-//   }
-// }
-
-// function addRatingIconEventListeners(messageDiv) {
-//   const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
-//   ratingIcons.forEach((icon, index) => {
-//     icon.addEventListener("click", () => {
-//       const ratingInput = document.getElementById("rating");
-//       ratingInput.value = index + 1;
-
-//       ratingIcons.forEach((star, i) => {
-//         if (i <= index) {
-//           star.classList.add("bi-star-fill");
-//           star.classList.remove("bi-star");
-//         } else {
-//           star.classList.remove("bi-star-fill");
-//           star.classList.add("bi-star");
-//         }
-//       });
-//     });
-//   });
-// }
-
-// addRatingIconEventListeners(messageDiv);
+  addRatingIconEventListeners(messageDiv);
+}
 
 
+function addRatingIconEventListeners(messageDiv) {
+  const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
+  ratingIcons.forEach((icon, index) => {
+    icon.addEventListener("click", handleRatingIconClick(messageDiv, index));
+  });
+}
 
+function handleRatingIconClick(messageDiv, index) {
+  return function () {
+    const ratingInput = messageDiv.querySelector("#rating");
+    ratingInput.value = index + 1;
+    const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
+    ratingIcons.forEach((star, i) => {
+      star.classList.toggle("bi-star-fill", i <= index);
+    });
+  };
+}
 
+async function handleRatingSubmission() {
+  const ratingInput = document.getElementById("rating");
+  const rating = ratingInput.value;
+  const feedbackMessageInput = document.getElementById("feedbackMessage");
+  const feedbackMessage = feedbackMessageInput.value;
+  const chatId = sessionStorage.getItem("chatId");
 
+  try {
+    const response = await fetch("/save-rating", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ratingValue: rating,
+        feedbackMessage: feedbackMessage,
+        chatId: chatId,
+      }),
+    });
 
-
-// ===============================================
-// ================ display form on page load =======================
-// ===============================================
-document.addEventListener("DOMContentLoaded", () => {
-  const isLiveChat = sessionStorage.getItem("chatWithAgent") === "true";
-  if (isLiveChat) {
-    const messageDiv = document.getElementById("response");
-    const content = "Please fill in the form below to get connected with a live agent.";
-
-    // fillAllDataForm(messageDiv, content, {});
-  }
-});
-
-
-// window.onload = function() {
-//   console.log("Page has loaded!");
-//   const messageDiv = document.getElementById("response");
-//     const data = {};
-//   showFormOnChatLoad(messageDiv, data);
-// };
-
-function showFormOnChatLoad(messageDiv, data) {
-  const userData = sessionStorage.getItem("userData");
-  if (!userData) {
-    // const chatLang = sessionStorage.getItem("selectedLanguage");
-    const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
-    const initialPrompt = chatLang === "Spanish"
-      ? "Por favor, proporcione su información de contacto para comenzar."
-      : "Please provide your contact information to get started.";
-
-    fillAllDataFormOnLoad(messageDiv, initialPrompt, data);
-    onLoadPage = false;
+    if (response.ok) {
+      const responseDiv = document.getElementById("response");
+      const thankYouDiv = document.createElement("div");
+      thankYouDiv.classList.add(
+        "alert",
+        "alert-success",
+        "alert-dismissible",
+        "fade",
+        "show"
+      );
+      thankYouDiv.setAttribute("role", "alert");
+      const thankYouMessage = chatLanguage === "Spanish"
+    ? "¡Gracias por tus comentarios!"
+    : "Thank you for your feedback!";
+  thankYouDiv.textContent = thankYouMessage;
+      responseDiv.appendChild(thankYouDiv);
+      thankYouDiv.scrollIntoView({ behavior: "smooth" });
+    }
+  } catch (error) {
+    console.error("Error submitting rating:", error);
   }
 }
 
-window.onload = function () {
-  console.log("Page has loaded!");
-  const responseDiv = document.getElementById("response");
+function addRatingIconEventListeners(messageDiv) {
+  const ratingIcons = messageDiv.querySelectorAll(".rating-icon");
+  ratingIcons.forEach((icon, index) => {
+    icon.addEventListener("click", () => {
+      const ratingInput = document.getElementById("rating");
+      ratingInput.value = index + 1;
 
-  const messageDiv = document.createElement("div");
-  responseDiv.appendChild(messageDiv);
+      ratingIcons.forEach((star, i) => {
+        if (i <= index) {
+          star.classList.add("bi-star-fill");
+          star.classList.remove("bi-star");
+        } else {
+          star.classList.remove("bi-star-fill");
+          star.classList.add("bi-star");
+        }
+      });
+    });
+  });
+}
 
-  const data = {};
-  showFormOnChatLoad(messageDiv, data);
-};
+addRatingIconEventListeners(messageDiv);
