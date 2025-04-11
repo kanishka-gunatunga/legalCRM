@@ -1097,8 +1097,10 @@ function showFormOnChatLoad(messageDiv, data) {
     // const chatLang = sessionStorage.getItem("selectedLanguage");
     const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
     const initialPrompt = chatLang === "Spanish"
-      ? "Por favor, proporcione su información de contacto para comenzar."
-      : "Please provide your contact information to get started.";
+      ? `Comparta su información de contacto o continúe con el chat si desea proporcionar más detalles.
+Ayúdenos a brindarle un mejor servicio: Sus datos`
+      : `Please share your contact information, or feel free to continue chatting if you’d like to provide more details.
+Help Us Serve You Better: Your Details`;
 
       if(showFormOneTime === false){
         fillAllDataFormOnLoad(messageDiv, initialPrompt, data);
