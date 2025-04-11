@@ -12,7 +12,7 @@ let clientDetailsSubmitStatus = false;
 
 let userData = {};
 let onLoadPage = true;
-
+let showFormOneTime = false;
 
 
 
@@ -862,6 +862,14 @@ document
         }
         if (data.answer !== null) {
           appendMessageToResponse("bot", data.answer, data);
+
+          if (showFormOneTime === false) {
+            const messageDiv = document.createElement("div");
+            document.getElementById("response").appendChild(messageDiv);
+            const data = {};  
+            showFormOnChatLoad(messageDiv, data);
+            showFormOneTime = true;
+          }
         }
 
         document.getElementById("startRecording").style.display = "block";
@@ -902,10 +910,10 @@ document
     appendLanguageMessage("Please ask your question in English.");
     updatePlaceholder();
 
-    // const messageDiv = document.createElement("div");
-    // document.getElementById("response").appendChild(messageDiv);
-    // const data = {}; 
-    // showFormOnChatLoad(messageDiv, data);
+    const messageDiv = document.createElement("div");
+    document.getElementById("response").appendChild(messageDiv);
+    const data = {}; 
+    showFormOnChatLoad(messageDiv, data);
   });
 
 document
@@ -915,10 +923,10 @@ document
     appendLanguageMessage("Por favor haga su pregunta en español.");
     updatePlaceholder();
 
-    // const messageDiv = document.createElement("div");
-    // document.getElementById("response").appendChild(messageDiv);
-    // const data = {};  
-    // showFormOnChatLoad(messageDiv, data);
+    const messageDiv = document.createElement("div");
+    document.getElementById("response").appendChild(messageDiv);
+    const data = {};  
+    showFormOnChatLoad(messageDiv, data);
   });
 
 
@@ -1092,18 +1100,22 @@ function showFormOnChatLoad(messageDiv, data) {
       ? "Por favor, proporcione su información de contacto para comenzar."
       : "Please provide your contact information to get started.";
 
-    fillAllDataFormOnLoad(messageDiv, initialPrompt, data);
+      if(showFormOneTime === false){
+        fillAllDataFormOnLoad(messageDiv, initialPrompt, data);
+        showFormOneTime = true
+      }
+    
     onLoadPage = false;
   }
 }
 
-window.onload = function () {
-  console.log("Page has loaded!");
-  const responseDiv = document.getElementById("response");
+// window.onload = function () {
+//   console.log("Page has loaded!");
+//   const responseDiv = document.getElementById("response");
 
-  const messageDiv = document.createElement("div");
-  responseDiv.appendChild(messageDiv);
+//   const messageDiv = document.createElement("div");
+//   responseDiv.appendChild(messageDiv);
 
-  const data = {};
-  showFormOnChatLoad(messageDiv, data);
-};
+//   const data = {};
+//   showFormOnChatLoad(messageDiv, data);
+// };
