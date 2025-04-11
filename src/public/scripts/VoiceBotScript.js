@@ -1097,9 +1097,9 @@ function showFormOnChatLoad(messageDiv, data) {
     // const chatLang = sessionStorage.getItem("selectedLanguage");
     const chatLang = sessionStorage.getItem("selectedLanguage") || "Spanish";
     const initialPrompt = chatLang === "Spanish"
-      ? `Comparta su información de contacto o continúe con el chat si desea proporcionar más detalles.
+      ? `Comparta su información de contacto o continúe con el chat si desea proporcionar más detalles. \n
 Ayúdenos a brindarle un mejor servicio: Sus datos`
-      : `Please share your contact information, or feel free to continue chatting if you’d like to provide more details.
+      : `Please share your contact information, or feel free to continue chatting if you’d like to provide more details. \n
 Help Us Serve You Better: Your Details`;
 
       if(showFormOneTime === false){
