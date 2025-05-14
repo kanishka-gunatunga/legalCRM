@@ -673,14 +673,7 @@ const payload = {
   const responseData1 = await response1.json();
   console.log("API 1 response:", responseData1);
 
-  if (responseData1.status === "success") {
-    sessionStorage.setItem("leadSubmitted", "true");
-    clientDetailsSubmitStatus = true;
-    showAlertSuccess(successMessage);
-    clearFormFields();
-    payloadSent = true;
-
-    const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
+  const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -690,6 +683,15 @@ const payload = {
 
     const responseData2 = await response2.json();
     console.log("API 2 response:", responseData2);
+
+  if (responseData1.status === "success") {
+    sessionStorage.setItem("leadSubmitted", "true");
+    clientDetailsSubmitStatus = true;
+    showAlertSuccess(successMessage);
+    clearFormFields();
+    payloadSent = true;
+
+    
   } else {
     const clientCreationErrorMessage = chatLang === "Spanish"
       ? "Error al crear cliente potencial: " + responseData1.message
