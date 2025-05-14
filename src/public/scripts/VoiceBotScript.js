@@ -662,7 +662,25 @@ const payload = {
   console.log("Payload to be sent:", payload);
 
   try {
-    const response = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+  const response1 = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const responseData1 = await response1.json();
+  console.log("API 1 response:", responseData1);
+
+  if (responseData1.status === "success") {
+    sessionStorage.setItem("leadSubmitted", "true");
+    clientDetailsSubmitStatus = true;
+    showAlertSuccess(successMessage);
+    clearFormFields();
+    payloadSent = true;
+
+    const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -670,22 +688,15 @@ const payload = {
       body: JSON.stringify(payload),
     });
 
-    const responseData = await response.json();
-    console.log("API response:", responseData);
-
-    if (responseData.status === "success") {
-      sessionStorage.setItem("leadSubmitted", "true");
-      clientDetailsSubmitStatus = true;
-      showAlertSuccess(successMessage);
-      clearFormFields();
-      payloadSent = true
-    } else {
-      const clientCreationErrorMessage = chatLang === "Spanish"
-        ? "Error al crear cliente potencial: " + responseData.message
-        : "Error creating prospect: " + responseData.message;
-      showAlert(clientCreationErrorMessage);
-    }
-  } catch (error) {
+    const responseData2 = await response2.json();
+    console.log("API 2 response:", responseData2);
+  } else {
+    const clientCreationErrorMessage = chatLang === "Spanish"
+      ? "Error al crear cliente potencial: " + responseData1.message
+      : "Error creating prospect: " + responseData1.message;
+    showAlert(clientCreationErrorMessage);
+  }
+}catch (error) {
     console.error("Error sending lead data:", error);
     // showAlert(genericErrorMessage);
   }
@@ -766,16 +777,24 @@ function sendUnsubmittedLeadData() {
       category: "normal"
     };
 
-    console.log("close: ", payload);
+    const blob = new Blob([JSON.stringify(payload)], {
+      type: "application/json"
+    });
 
     navigator.sendBeacon(
       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
-      new Blob([JSON.stringify(payload)], { type: "application/json" })
+      blob
     );
 
-    console.log("Unsubmitted lead sent on chat close.");
+    navigator.sendBeacon(
+      "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+      blob
+    );
+
+    console.log("Unsubmitted lead sent to both APIs on chat close.");
   }
 }
+
 
 
 function appendPlainTextContent(messageDiv, content) {
@@ -792,6 +811,26 @@ function appendPlainTextContent(messageDiv, content) {
 
 
 
+// window.addEventListener("beforeunload", function (e) {
+//   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+//   const userData = sessionStorage.getItem("userData");
+
+//   if (!isSubmitted && userData) {
+//     const payload = {
+//       ...JSON.parse(userData),
+//       lead_value: 0,
+//       category: "normal"
+//     };
+
+//     console.log("before close: ",payload)
+
+//     navigator.sendBeacon(
+//       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+//       new Blob([JSON.stringify(payload)], { type: "application/json" })
+//     );
+//   }
+// });
+
 window.addEventListener("beforeunload", function (e) {
   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
   const userData = sessionStorage.getItem("userData");
@@ -803,11 +842,20 @@ window.addEventListener("beforeunload", function (e) {
       category: "normal"
     };
 
-    console.log("before close: ",payload)
+    console.log("before close: ", payload);
+
+    const blob = new Blob([JSON.stringify(payload)], {
+      type: "application/json"
+    });
 
     navigator.sendBeacon(
       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
-      new Blob([JSON.stringify(payload)], { type: "application/json" })
+      blob
+    );
+
+    navigator.sendBeacon(
+      "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+      blob
     );
   }
 });
