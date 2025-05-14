@@ -262,6 +262,8 @@ function showEndChatAlertBot() {
 
 // Function - start rating
 function handleEndChatBot() {
+  sendUnsubmittedLeadData(); 
+    sessionStorage.setItem("leadSubmitted", "true");
   chatLanguage = sessionStorage.getItem("selectedLanguage");
   showAlertSuccess("Thank you for chat with us..");
 }
@@ -606,6 +608,8 @@ function handleLiveAgentButtonClick(formId) {
 }
 
 
+let payloadSent = false;
+
 async function sendLeadDataToAPI() {
   const leadData = JSON.parse(sessionStorage.getItem("leadData"));
   // const chatLang = sessionStorage.getItem("selectedLanguage");
@@ -641,10 +645,19 @@ async function sendLeadDataToAPI() {
     return;
   }
 
-  const payload = {
-    ...leadData,
-    lead_value: leadValue
-  };
+  // const payload = {
+  //   ...leadData,
+  //   lead_value: leadValue
+  // };
+
+  const category = leadData.description && leadData.description.trim() !== "" ? "qualified" : "normal";
+
+const payload = {
+  ...leadData,
+  lead_value: leadValue,
+  category: category
+};
+
 
   console.log("Payload to be sent:", payload);
 
@@ -661,9 +674,11 @@ async function sendLeadDataToAPI() {
     console.log("API response:", responseData);
 
     if (responseData.status === "success") {
+      sessionStorage.setItem("leadSubmitted", "true");
       clientDetailsSubmitStatus = true;
       showAlertSuccess(successMessage);
       clearFormFields();
+      payloadSent = true
     } else {
       const clientCreationErrorMessage = chatLang === "Spanish"
         ? "Error al crear cliente potencial: " + responseData.message
@@ -692,27 +707,76 @@ function clearFormFields() {
 // ===============================================
 // ================ chat close handle =======================
 // ===============================================
-async function chatCloseByUser() {
-  if (agentJoined === true) {
-    const chatId = sessionStorage.getItem("chatId");
-    const response = await fetch("/close-live-chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chatId: chatId }),
-    });
+// async function chatCloseByUser() {
+//   if (agentJoined === true) {
+//     const chatId = sessionStorage.getItem("chatId");
+//     const response = await fetch("/close-live-chat", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ chatId: chatId }),
+//     });
 
-    const dataChatClose = await response.json();
-    console.log("Data Chat Close --: ", dataChatClose);
-    if (dataChatClose.status === "success") {
-      showEndChatAlertAgent();
-    }
-  } else {
+//     const dataChatClose = await response.json();
+//     console.log("Data Chat Close --: ", dataChatClose);
+//     if (dataChatClose.status === "success") {
+//       showEndChatAlertAgent();
+//     }
+//   } else {
+//     console.log("Chat bot doesn't have rating...");
+//     showEndChatAlertBot();
+//   }
+// }
+
+async function chatCloseByUser() {
+  // if (agentJoined === true) {
+  //   const chatId = sessionStorage.getItem("chatId");
+  //   const response = await fetch("/close-live-chat", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ chatId: chatId }),
+  //   });
+
+  //   const dataChatClose = await response.json();
+  //   console.log("Data Chat Close --: ", dataChatClose);
+
+  //   if (dataChatClose.status === "success") {
+  //     sendUnsubmittedLeadData(); 
+  //     showEndChatAlertAgent();
+  //   }
+  // } else {
     console.log("Chat bot doesn't have rating...");
     showEndChatAlertBot();
+    
+    
+  // }
+}
+
+function sendUnsubmittedLeadData() {
+  const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+  const userData = sessionStorage.getItem("userData");
+
+  if (!isSubmitted && userData) {
+    const payload = {
+      ...JSON.parse(userData),
+      lead_value: 0,
+      category: "normal"
+    };
+
+    console.log("close: ", payload);
+
+    navigator.sendBeacon(
+      "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+      new Blob([JSON.stringify(payload)], { type: "application/json" })
+    );
+
+    console.log("Unsubmitted lead sent on chat close.");
   }
 }
+
 
 function appendPlainTextContent(messageDiv, content) {
   messageDiv.innerHTML = `<div class="messageWrapper">
@@ -722,6 +786,32 @@ function appendPlainTextContent(messageDiv, content) {
                               </div>
                           </div>`;
 }
+
+
+
+
+
+
+window.addEventListener("beforeunload", function (e) {
+  const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+  const userData = sessionStorage.getItem("userData");
+
+  if (!isSubmitted && userData) {
+    const payload = {
+      ...JSON.parse(userData),
+      lead_value: 0,
+      category: "normal"
+    };
+
+    console.log("before close: ",payload)
+
+    navigator.sendBeacon(
+      "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+      new Blob([JSON.stringify(payload)], { type: "application/json" })
+    );
+  }
+});
+
 
 
 
