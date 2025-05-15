@@ -762,13 +762,46 @@ async function chatCloseByUser() {
   //   }
   // } else {
     console.log("Chat bot doesn't have rating...");
+    sendUnsubmittedLeadData();
     showEndChatAlertBot();
     
     
   // }
 }
 
-function sendUnsubmittedLeadData() {
+// function sendUnsubmittedLeadData() {
+//   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+//   const userData = sessionStorage.getItem("userData");
+
+//   if (!isSubmitted && userData) {
+//     const payload = {
+//       ...JSON.parse(userData),
+//       lead_value: 0,
+//       category: "normal"
+//     };
+
+//     const blob = new Blob([JSON.stringify(payload)], {
+//       type: "application/json"
+//     });
+
+//     navigator.sendBeacon(
+//       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+//       blob
+//     );
+
+//     navigator.sendBeacon(
+//       "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+//       blob
+//     );
+
+//     console.log("Unsubmitted lead sent to both APIs on chat close.");
+//   }
+// }
+window.addEventListener("beforeunload", function (e) {
+  sendUnsubmittedLeadData();
+});
+
+async function sendUnsubmittedLeadData() {
   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
   const userData = sessionStorage.getItem("userData");
 
@@ -779,21 +812,33 @@ function sendUnsubmittedLeadData() {
       category: "normal"
     };
 
-    const blob = new Blob([JSON.stringify(payload)], {
-      type: "application/json"
-    });
+    try {
+      const response1 = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data1 = await response1.json();
+      console.log("API 1 response:", data1);
+    } catch (error) {
+      console.error("Error sending to API 1:", error);
+    }
 
-    navigator.sendBeacon(
-      "https://projects.genaitech.dev/laravel-crm/api/create-lead",
-      blob
-    );
-
-    navigator.sendBeacon(
-      "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
-      blob
-    );
-
-    console.log("Unsubmitted lead sent to both APIs on chat close.");
+    try {
+      const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data2 = await response2.json();
+      console.log("API 2 response:", data2);
+    } catch (error) {
+      console.error("Error sending to API 2:", error);
+    }
   }
 }
 
