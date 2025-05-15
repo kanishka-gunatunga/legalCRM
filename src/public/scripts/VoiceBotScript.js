@@ -262,7 +262,7 @@ function showEndChatAlertBot() {
 
 // Function - start rating
 function handleEndChatBot() {
-  sendUnsubmittedLeadData(); 
+  sendUnsubmittedLeadData();
     sessionStorage.setItem("leadSubmitted", "true");
   chatLanguage = sessionStorage.getItem("selectedLanguage");
   showAlertSuccess("Thank you for chat with us..");
@@ -762,7 +762,7 @@ async function chatCloseByUser() {
   //   }
   // } else {
     console.log("Chat bot doesn't have rating...");
-    sendUnsubmittedLeadData();
+    
     showEndChatAlertBot();
     
     
