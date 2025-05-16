@@ -143,6 +143,17 @@ app.post("/update-document", handleFileUploadUpdate, updateDocuments);
 
 app.get("/delete-document", adminLogged, deleteDocument);
 
+app.get('/flow-english',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-english');
+});
+app.get('/flow-sinhala',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-sinhala');
+});
+app.get('/flow-tamil',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-tamil');
+});
+
+
 app.get("/login", (req: Request, res: Response) => {
   const successMessage = req.flash("success")[0];
   const errorMessage = req.flash("error")[0];
