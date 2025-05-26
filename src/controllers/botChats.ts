@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import BotChats from '../../models/BotChats';
-
+import Leads from '../../models/Leads';
 
 interface UserDecodedToken extends JwtPayload {
   id: string;
@@ -249,4 +249,27 @@ export const botChatsRefreshMessage = async (req: Request, res: Response, next: 
       </div>-->
     </div>`
     return res.json({status:"success", message:message_history})
+};
+
+export const saveLead = async (req: Request, res: Response, next: NextFunction) => {
+    const {title,lead_value,description,category,email,phone} = req.body
+    try {
+ 
+        await Leads.create(
+          { 
+          title: 'Lead for ' + title,
+          lead_value: lead_value,
+          description: description,
+          category: category,
+          person: title,
+          email: email,
+          phone: phone,
+          },
+        );
+        res.json({ status: "success" })
+    }
+    catch (error) {
+        console.error("Error processing question:", error);
+        res.status(500).json({ error: "An error occurred." });
+    }
 };
