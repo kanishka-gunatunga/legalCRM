@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import BotChats from '../../models/BotChats';
 import Leads from '../../models/Leads';
+import { Op } from 'sequelize';
 
 interface UserDecodedToken extends JwtPayload {
   id: string;
@@ -267,6 +268,50 @@ export const saveLead = async (req: Request, res: Response, next: NextFunction) 
           },
         );
         res.json({ status: "success" })
+    }
+    catch (error) {
+        console.error("Error processing question:", error);
+        res.status(500).json({ error: "An error occurred." });
+    }
+};
+
+export const exportLeads = async (req: Request, res: Response, next: NextFunction) => {
+    const { from, to, count, min, max } = req.query;
+    try {
+      const filters: any = {};
+
+          // Date range filter
+          if (from || to) {
+            filters.createdAt = {};
+            if (from) filters.createdAt[Op.gte] = new Date(from as string);
+            if (to) filters.createdAt[Op.lte] = new Date(to as string);
+          }
+
+          // Lead value filter
+          if (min || max) {
+            filters.lead_value = {};
+            if (min) filters.lead_value[Op.gte] = parseFloat(min as string);
+            if (max) filters.lead_value[Op.lte] = parseFloat(max as string);
+          }
+
+          // Query options
+          const options: any = {
+            where: filters,
+            order: [['createdAt', 'DESC']],
+          };
+
+          // Count limit
+          if (count) {
+            options.limit = parseInt(count as string);
+          }
+
+          const leads = await Leads.findAll(options);
+
+          res.json({
+            status: "success",
+            total: leads.length,
+            leads,
+          });
     }
     catch (error) {
         console.error("Error processing question:", error);
