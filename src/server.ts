@@ -134,14 +134,14 @@ app.post("/direct-connect-live-agent", directConnectAgent);
 app.post("/save-rating", saveRating);
 app.post("/save-lead", saveLead);
 app.get("/view-documents", adminLogged, viewDocuments);
-app.get("/upload-documents", (req: Request, res: Response) => {
+app.get("/upload-documents", adminLogged, (req: Request, res: Response) => {
   res.render("upload-documents");
 });
 app.get("/edit-document", adminLogged, editDocument);
 
-app.post("/upload-documents", handleFileUpload, uploadDocuments);
+app.post("/upload-documents",adminLogged, handleFileUpload, uploadDocuments);
 
-app.post("/update-document", handleFileUploadUpdate, updateDocuments);
+app.post("/update-document", adminLogged, handleFileUploadUpdate, updateDocuments);
 
 app.get("/delete-document", adminLogged, deleteDocument);
 
@@ -165,6 +165,17 @@ app.get("/login", (req: Request, res: Response) => {
   });
 });
 app.post("/login", login);
+
+app.get('/flow-english',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-english');
+});
+app.get('/flow-sinhala',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-sinhala');
+});
+app.get('/flow-tamil',adminLogged, async (req: Request, res: Response) => {
+  res.render('flow-tamil');
+});
+
 
 app.get("/admin-dashboard", adminLogged, (req: Request, res: Response) => {
   res.render("admin-dashboard");
