@@ -262,6 +262,8 @@ function showEndChatAlertBot() {
 
 // Function - start rating
 function handleEndChatBot() {
+  sendUnsubmittedLeadData();
+    sessionStorage.setItem("leadSubmitted", "true");
   chatLanguage = sessionStorage.getItem("selectedLanguage");
   showAlertSuccess("Thank you for chat with us..");
 }
@@ -606,6 +608,8 @@ function handleLiveAgentButtonClick(formId) {
 }
 
 
+let payloadSent = false;
+
 async function sendLeadDataToAPI() {
   const leadData = JSON.parse(sessionStorage.getItem("leadData"));
   // const chatLang = sessionStorage.getItem("selectedLanguage");
@@ -641,15 +645,35 @@ async function sendLeadDataToAPI() {
     return;
   }
 
-  const payload = {
-    ...leadData,
-    lead_value: leadValue
-  };
+  // const payload = {
+  //   ...leadData,
+  //   lead_value: leadValue
+  // };
+
+  const category = leadData.description && leadData.description.trim() !== "" ? "qualified" : "normal";
+
+const payload = {
+  ...leadData,
+  lead_value: leadValue,
+  category: category
+};
+
 
   console.log("Payload to be sent:", payload);
 
   try {
-    const response = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+  const response1 = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const responseData1 = await response1.json();
+  console.log("API 1 response:", responseData1);
+
+  const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -657,20 +681,24 @@ async function sendLeadDataToAPI() {
       body: JSON.stringify(payload),
     });
 
-    const responseData = await response.json();
-    console.log("API response:", responseData);
+    const responseData2 = await response2.json();
+    console.log("API 2 response:", responseData2);
 
-    if (responseData.status === "success") {
-      clientDetailsSubmitStatus = true;
-      showAlertSuccess(successMessage);
-      clearFormFields();
-    } else {
-      const clientCreationErrorMessage = chatLang === "Spanish"
-        ? "Error al crear cliente potencial: " + responseData.message
-        : "Error creating prospect: " + responseData.message;
-      showAlert(clientCreationErrorMessage);
-    }
-  } catch (error) {
+  if (responseData1.status === "success") {
+    sessionStorage.setItem("leadSubmitted", "true");
+    clientDetailsSubmitStatus = true;
+    showAlertSuccess(successMessage);
+    clearFormFields();
+    payloadSent = true;
+
+    
+  } else {
+    const clientCreationErrorMessage = chatLang === "Spanish"
+      ? "Error al crear cliente potencial: " + responseData1.message
+      : "Error creating prospect: " + responseData1.message;
+    showAlert(clientCreationErrorMessage);
+  }
+}catch (error) {
     console.error("Error sending lead data:", error);
     // showAlert(genericErrorMessage);
   }
@@ -692,27 +720,129 @@ function clearFormFields() {
 // ===============================================
 // ================ chat close handle =======================
 // ===============================================
-async function chatCloseByUser() {
-  if (agentJoined === true) {
-    const chatId = sessionStorage.getItem("chatId");
-    const response = await fetch("/close-live-chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chatId: chatId }),
-    });
+// async function chatCloseByUser() {
+//   if (agentJoined === true) {
+//     const chatId = sessionStorage.getItem("chatId");
+//     const response = await fetch("/close-live-chat", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ chatId: chatId }),
+//     });
 
-    const dataChatClose = await response.json();
-    console.log("Data Chat Close --: ", dataChatClose);
-    if (dataChatClose.status === "success") {
-      showEndChatAlertAgent();
-    }
-  } else {
+//     const dataChatClose = await response.json();
+//     console.log("Data Chat Close --: ", dataChatClose);
+//     if (dataChatClose.status === "success") {
+//       showEndChatAlertAgent();
+//     }
+//   } else {
+//     console.log("Chat bot doesn't have rating...");
+//     showEndChatAlertBot();
+//   }
+// }
+
+async function chatCloseByUser() {
+  // if (agentJoined === true) {
+  //   const chatId = sessionStorage.getItem("chatId");
+  //   const response = await fetch("/close-live-chat", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ chatId: chatId }),
+  //   });
+
+  //   const dataChatClose = await response.json();
+  //   console.log("Data Chat Close --: ", dataChatClose);
+
+  //   if (dataChatClose.status === "success") {
+  //     sendUnsubmittedLeadData(); 
+  //     showEndChatAlertAgent();
+  //   }
+  // } else {
     console.log("Chat bot doesn't have rating...");
+    
     showEndChatAlertBot();
+    
+    
+  // }
+}
+
+// function sendUnsubmittedLeadData() {
+//   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+//   const userData = sessionStorage.getItem("userData");
+
+//   if (!isSubmitted && userData) {
+//     const payload = {
+//       ...JSON.parse(userData),
+//       lead_value: 0,
+//       category: "normal"
+//     };
+
+//     const blob = new Blob([JSON.stringify(payload)], {
+//       type: "application/json"
+//     });
+
+//     navigator.sendBeacon(
+//       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+//       blob
+//     );
+
+//     navigator.sendBeacon(
+//       "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+//       blob
+//     );
+
+//     console.log("Unsubmitted lead sent to both APIs on chat close.");
+//   }
+// }
+window.addEventListener("beforeunload", function (e) {
+  sendUnsubmittedLeadData();
+});
+
+async function sendUnsubmittedLeadData() {
+  const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+  const userData = sessionStorage.getItem("userData");
+
+  if (!isSubmitted && userData) {
+    const payload = {
+      ...JSON.parse(userData),
+      lead_value: 0,
+      category: "normal"
+    };
+
+    try {
+      const response1 = await fetch("https://projects.genaitech.dev/laravel-crm/api/create-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data1 = await response1.json();
+      console.log("API 1 response:", data1);
+    } catch (error) {
+      console.error("Error sending to API 1:", error);
+    }
+
+    try {
+      const response2 = await fetch("https://sites.techvoice.lk/crm-xeroit/api/create-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data2 = await response2.json();
+      console.log("API 2 response:", data2);
+    } catch (error) {
+      console.error("Error sending to API 2:", error);
+    }
   }
 }
+
+
 
 function appendPlainTextContent(messageDiv, content) {
   messageDiv.innerHTML = `<div class="messageWrapper">
@@ -722,6 +852,61 @@ function appendPlainTextContent(messageDiv, content) {
                               </div>
                           </div>`;
 }
+
+
+
+
+
+
+// window.addEventListener("beforeunload", function (e) {
+//   const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+//   const userData = sessionStorage.getItem("userData");
+
+//   if (!isSubmitted && userData) {
+//     const payload = {
+//       ...JSON.parse(userData),
+//       lead_value: 0,
+//       category: "normal"
+//     };
+
+//     console.log("before close: ",payload)
+
+//     navigator.sendBeacon(
+//       "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+//       new Blob([JSON.stringify(payload)], { type: "application/json" })
+//     );
+//   }
+// });
+
+window.addEventListener("beforeunload", function (e) {
+  const isSubmitted = sessionStorage.getItem("leadSubmitted") === "true";
+  const userData = sessionStorage.getItem("userData");
+
+  if (!isSubmitted && userData) {
+    const payload = {
+      ...JSON.parse(userData),
+      lead_value: 0,
+      category: "normal"
+    };
+
+    console.log("before close: ", payload);
+
+    const blob = new Blob([JSON.stringify(payload)], {
+      type: "application/json"
+    });
+
+    navigator.sendBeacon(
+      "https://projects.genaitech.dev/laravel-crm/api/create-lead",
+      blob
+    );
+
+    navigator.sendBeacon(
+      "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+      blob
+    );
+  }
+});
+
 
 
 
