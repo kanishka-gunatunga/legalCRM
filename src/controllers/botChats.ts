@@ -252,11 +252,19 @@ export const botChatsRefreshMessage = async (req: Request, res: Response, next: 
 };
 
 export const saveLead = async (req: Request, res: Response, next: NextFunction) => {
-    const {ratingValue,feedbackMessage,chatId} = req.body
+    const {title,lead_value,description,category,email,phone} = req.body
     try {
-        await Leads.update(
-            { rating:ratingValue,feedback:feedbackMessage,},
-            { where: { message_id: chatId } }
+ 
+        await Leads.create(
+          { 
+          title: 'Lead for ' + title,
+          lead_value: lead_value,
+          description: description,
+          category: category,
+          person: title,
+          email: email,
+          phone: phone,
+          },
         );
         res.json({ status: "success" })
     }
