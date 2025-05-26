@@ -7,17 +7,7 @@ const sequelize = new Sequelize({
   port: 3306,
   database: 'techvoice_legal_crm_bot',
   username: 'techvoice_user',
-  password: '%Bm=410[=A$R',
-  logging: console.log, // enable logging
-  dialectOptions: {
-    connectTimeout: 10000, // 10s timeout
-  }
-});
-
-sequelize.authenticate().then(() => {
-  console.log('DB connected.');
-}).catch((err) => {
-  console.error('DB connection error:', err);
+  password: '%Bm=410[=A$R'
 });
 
 export default sequelize;

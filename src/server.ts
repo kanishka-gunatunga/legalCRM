@@ -55,6 +55,7 @@ import {
   botChatsGetMessages,
   botChatsRefresh,
   botChatsRefreshMessage,
+  saveLead
 } from "./controllers/botChats";
 import {
   LiveChatHistoryOnload,
@@ -131,6 +132,7 @@ app.post("/live-chat-user", liveChatUser);
 app.post("/switch-to-live-agent", switchToAgent);
 app.post("/direct-connect-live-agent", directConnectAgent);
 app.post("/save-rating", saveRating);
+app.post("/save-lead", saveLead);
 app.get("/view-documents", adminLogged, viewDocuments);
 app.get("/upload-documents", (req: Request, res: Response) => {
   res.render("upload-documents");
