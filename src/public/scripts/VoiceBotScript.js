@@ -684,6 +684,17 @@ const payload = {
     const responseData2 = await response2.json();
     console.log("API 2 response:", responseData2);
 
+     const response3 = await fetch("https://legal-crm.vercel.app/save-lead", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseData3 = await response3.json();
+    console.log("API 3 response:", responseData3);
+
   if (responseData1.status === "success") {
     sessionStorage.setItem("leadSubmitted", "true");
     clientDetailsSubmitStatus = true;
@@ -839,6 +850,20 @@ async function sendUnsubmittedLeadData() {
     } catch (error) {
       console.error("Error sending to API 2:", error);
     }
+
+    try {
+      const response3 = await fetch("https://legal-crm.vercel.app/save-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data3 = await response3.json();
+      console.log("API 3 response:", data3);
+    } catch (error) {
+      console.error("Error sending to API 3:", error);
+    }
   }
 }
 
@@ -902,6 +927,11 @@ window.addEventListener("beforeunload", function (e) {
 
     navigator.sendBeacon(
       "https://sites.techvoice.lk/crm-xeroit/api/create-lead",
+      blob
+    );
+
+    navigator.sendBeacon(
+      "https://legal-crm.vercel.app/save-lead",
       blob
     );
   }
