@@ -16,6 +16,7 @@ interface UserDecodedToken extends JwtPayload {
 export const login = async (req: Request, res: Response, next: Function) => {
     let email = req.body.email;
     let password = req.body.password;
+    
     try {
       const user = await User.findOne({
         where: {

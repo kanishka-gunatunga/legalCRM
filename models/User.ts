@@ -3,7 +3,7 @@ import sequelize from '../database/sequelize';
 
 class User extends Model {
   public id!: number;
-  public username!: string;
+  public email!: string;
   public password!: string;
   public user_role!: number;
   public status!: string;
