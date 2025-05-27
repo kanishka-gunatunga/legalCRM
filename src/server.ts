@@ -70,6 +70,7 @@ import {
 } from "./controllers/quickQuestions";
 import Admin from "../models/Admin";
 import QuickQuestion from "../models/QuickQuestion";
+import FlowFormSubmission from "../models/FlowFormSubmission";
 import User from "../models/User";
 import BotChats from "../models/BotChats";
 import Agent from "../models/Agent";
@@ -84,6 +85,11 @@ import { verifyWebhookInsta,sendReplyInsta} from "./controllers/instagramChat";
 import { chatResponseTrigger } from "./controllers/botTrigger";
 import { insertNode,insertEdge,updateNode,updateEdge,deleteNode,deleteEdge,retrieveData,textOnlyData,textBoxData,ButtonGroup,formData
   ,ButtonData,CardData,getIntentData,getTargetData,saveFormSubmission} from './controllers/dataFlowController';
+
+import { getFlowPage } from './controllers/flowController';
+import { getBotFlowPage } from './controllers/botFlowChatView';
+import { chatFlowResponse } from './controllers/botFlowChatController';
+import { chatFlowData } from './controllers/botFlowData'
 const app = express();
 app.use(cookieParser());
 // Set up view engine
@@ -158,6 +164,40 @@ app.get('/flow-tamil',adminLogged, async (req: Request, res: Response) => {
   res.render('flow-tamil');
 });
 
+app.use('/bot-flow-test', getBotFlowPage);
+app.post('/api/chat-response-flow', chatFlowResponse);
+app.post('/api/products-data', chatFlowData);
+
+app.get('/view-leads', adminLogged, async (req: Request, res: Response) => {
+  let node_id: string = req.query.id as string;
+  const leads = await FlowFormSubmission.findAll({
+  where: {
+    form_id: node_id
+  }
+});
+  res.render('view-leads', { leads: leads }); 
+});
+
+app.post("/data-flow-insert-node", insertNode);
+app.post("/data-flow-update-edge", updateEdge);
+app.post("/data-flow-update-node", updateNode);
+app.post("/data-flow-insert-edge", insertEdge);
+app.post("/data-flow-delete-node", deleteNode);
+app.post("/data-flow-delete-edge", deleteEdge);
+app.post("/data-flow-retrieve-data", retrieveData);
+
+app.post("/data-flow-text", textOnlyData);
+app.post("/data-flow-text-box", textBoxData);
+app.post("/data-flow-button-data", ButtonData);
+app.post("/data-flow-button-group", ButtonGroup);
+app.post("/data-flow-form-data", formData);
+
+app.post("/data-flow-card-data",handleFileUpload, CardData);
+
+app.post("/chat-bot-get-intent-data", getIntentData);
+app.post("/chat-bot-get-target-data", getTargetData);
+
+app.post("/chat-bot-save-form-submission", saveFormSubmission);
 
 app.get("/login", (req: Request, res: Response) => {
   const successMessage = req.flash("success")[0];
