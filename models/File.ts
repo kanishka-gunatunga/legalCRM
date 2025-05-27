@@ -5,6 +5,8 @@ class File extends Model {
   public id!: number;
   public user_id!: number;
   public file_id!: string;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 File.init(
@@ -22,6 +24,16 @@ File.init(
       type: new DataTypes.STRING(),
       allowNull: false,
     },
+    updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
   },
   {
     sequelize,

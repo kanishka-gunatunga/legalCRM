@@ -46,7 +46,7 @@ export const liveChatsOnload = async (req: Request, res: Response, next: NextFun
           let time = "";
           let message = "";
           if(lastMessage[0]){
-            const timestamp = new Date(`${lastMessage[0].createdAt}`);
+            const timestamp = new Date(`${lastMessage[0].created_at}`);
             time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });
             message = lastMessage[0].message.slice(0, 30);
           }
@@ -108,7 +108,7 @@ export const refreshLiveChats = async (req: Request, res: Response, next: NextFu
         let time = "";
         let message = "";
         if(lastMessage[0]){
-          const timestamp = new Date(`${lastMessage[0].createdAt}`);
+          const timestamp = new Date(`${lastMessage[0].created_at}`);
           time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });
           message = lastMessage[0].message.slice(0, 30);
         }
@@ -172,7 +172,7 @@ export const replyLiveChats = async (req: Request, res: Response, next: NextFunc
   <div class="chat-messages  inner-live-chats" id="live-chat-inner-`+message_id+`" data-id="`+message_id+`">`
 
   for (var i = 0; i < chats.length; i++) {
-    const timestamp = new Date("'"+chats[i].createdAt+"'");
+    const timestamp = new Date("'"+chats[i].created_at+"'");
     const formattedDateTime = timestamp.toLocaleString(); 
     if(chats[i].sent_by == "customer"){
         message_history += `<div class="chat-msg user">
@@ -291,7 +291,7 @@ export const refreshLiveChatInner = async (req: Request, res: Response, next: Ne
     order: [['id', 'ASC']],
   });
   for (var i = 0; i < chats.length; i++) {
-    const timestamp = new Date("'"+chats[i].createdAt+"'");
+    const timestamp = new Date("'"+chats[i].created_at+"'");
     const formattedDateTime = timestamp.toLocaleString(); 
     if(chats[i].sent_by == "customer"){
         message_history += `<div class="chat-msg user">

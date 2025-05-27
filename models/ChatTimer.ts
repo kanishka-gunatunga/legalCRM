@@ -6,8 +6,8 @@ class ChatTimer extends Model {
   public message_id!: string;
   public agent!: string;
   public time!: number;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 ChatTimer.init(
@@ -29,12 +29,12 @@ ChatTimer.init(
       type: new DataTypes.DOUBLE(),
       allowNull: false,
     },
-    createdAt: {
+    updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    updatedAt: {
+    created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

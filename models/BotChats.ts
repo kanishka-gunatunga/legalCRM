@@ -8,8 +8,8 @@ class BotChats extends Model {
   public message!: string;
   public message_sent_by!: string;
   public viewed_by_admin!: string;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 BotChats.init(
@@ -39,12 +39,12 @@ BotChats.init(
         type: new DataTypes.STRING(),
         allowNull: true,
       },
-      createdAt: {
+      updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      updatedAt: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

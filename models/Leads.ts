@@ -3,11 +3,15 @@ import sequelize from '../database/sequelize';
 
 class Leads extends Model {
   public id!: number;
-  public message_id!: string;
-  public agent!: string;
-  public time!: number;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public title!: string;
+  public lead_value!: number;
+  public description!: string;
+  public category!: string;
+  public person!: string;
+  public email!: string;
+  public phone!: string;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 Leads.init(
@@ -45,12 +49,12 @@ Leads.init(
       type: new DataTypes.STRING(),
       allowNull: true,
     },
-    createdAt: {
+    updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    updatedAt: {
+    created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

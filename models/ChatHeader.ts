@@ -10,6 +10,8 @@ class ChatHeader extends Model {
   public feedback!: string;
   public status!: string;
   public is_time_out!: string;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 ChatHeader.init(
@@ -46,6 +48,16 @@ ChatHeader.init(
       is_time_out: {
         type: new DataTypes.STRING(),
         allowNull: true,
+      },
+      updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
   },
   {

@@ -5,6 +5,9 @@ class AgentLanguages extends Model {
   public id!: number;
   public user_id!: number;
   public language!: string;
+  public updated_at!: Date;
+  public created_at!: Date;
+  
 }
 
 AgentLanguages.init(
@@ -22,6 +25,16 @@ AgentLanguages.init(
       type: new DataTypes.STRING(),
       allowNull: false,
     },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
   },
   {
     sequelize,

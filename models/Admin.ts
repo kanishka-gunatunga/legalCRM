@@ -7,6 +7,8 @@ class Admin extends Model {
   public name!: string;
   public phone!: string;
   public status!: string;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 Admin.init(
@@ -32,6 +34,16 @@ Admin.init(
       type: new DataTypes.STRING(),
       allowNull: false,
     },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
   },
   {
     sequelize,

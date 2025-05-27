@@ -8,8 +8,8 @@ class LiveChat extends Model {
   public message!: string;
   public sent_to_user!: string;
   public viewed_by_agent!: string;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 LiveChat.init(
@@ -39,12 +39,12 @@ LiveChat.init(
         type: new DataTypes.STRING(),
         allowNull: true,
       },
-      createdAt: {
+      updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      updatedAt: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

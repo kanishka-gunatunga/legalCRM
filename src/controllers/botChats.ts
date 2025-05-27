@@ -34,7 +34,7 @@ export const botChatsOnload = async (req: Request, res: Response, next: NextFunc
             },
             order: [['id', 'DESC']],
           });
-        const timestamp = new Date("'"+lastMessage[0].createdAt+"'");
+        const timestamp = new Date("'"+lastMessage[0].created_at+"'");
         const time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });  
         chat += `<div class="p-20 bb-1 d-flex align-items-center justify-content-between pull-up" onclick="GetAllChats('`+chats[i].message_id+`')">
         <div class="d-flex align-items-center">
@@ -85,7 +85,7 @@ message_history += ` <div class="box">
 <div class="box-body mb-30">
     <div class="chat-box-six" >`
     for (var i = 0; i < chats.length; i++) {
-        const timestamp = new Date("'"+chats[i].createdAt+"'");
+        const timestamp = new Date("'"+chats[i].created_at+"'");
         const formattedDateTime = timestamp.toLocaleString();   
         if(chats[i].message_sent_by == "customer"){
             message_history += `<div class="rt-bx mb-30 d-flex align-items-start w-p100">
@@ -154,7 +154,7 @@ export const botChatsRefresh = async (req: Request, res: Response, next: NextFun
             },
             order: [['id', 'DESC']],
           });
-        const timestamp = new Date("'"+lastMessage[0].createdAt+"'");
+        const timestamp = new Date("'"+lastMessage[0].created_at+"'");
         const time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });  
         chat += `<div class="p-20 bb-1 d-flex align-items-center justify-content-between pull-up" onclick="GetAllChats('`+chats[i].message_id+`')">
         <div class="d-flex align-items-center">
@@ -205,7 +205,7 @@ export const botChatsRefreshMessage = async (req: Request, res: Response, next: 
     <div class="box-body mb-30">
         <div class="chat-box-six" >`
         for (var i = 0; i < chats.length; i++) {
-            const timestamp = new Date("'"+chats[i].createdAt+"'");
+            const timestamp = new Date("'"+chats[i].created_at+"'");
             const formattedDateTime = timestamp.toLocaleString();   
             if(chats[i].message_sent_by == "customer"){
                 message_history += `<div class="rt-bx mb-30 d-flex align-items-start w-p100">
@@ -282,9 +282,9 @@ export const exportLeads = async (req: Request, res: Response, next: NextFunctio
 
           // Date range filter
           if (from || to) {
-            filters.createdAt = {};
-            if (from) filters.createdAt[Op.gte] = new Date(from as string);
-            if (to) filters.createdAt[Op.lte] = new Date(to as string);
+            filters.created_at = {};
+            if (from) filters.created_at[Op.gte] = new Date(from as string);
+            if (to) filters.created_at[Op.lte] = new Date(to as string);
           }
 
           // Lead value filter
@@ -297,7 +297,7 @@ export const exportLeads = async (req: Request, res: Response, next: NextFunctio
           // Query options
           const options: any = {
             where: filters,
-            order: [['createdAt', 'DESC']],
+            order: [['created_at', 'DESC']],
           };
 
           // Count limit

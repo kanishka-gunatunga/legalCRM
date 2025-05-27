@@ -8,8 +8,8 @@ class User extends Model {
   public user_role!: number;
   public status!: string;
   public online_status!: string;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 User.init(
@@ -39,12 +39,12 @@ User.init(
       type: new DataTypes.STRING(),
       allowNull: true,
     },
-    createdAt: {
+    updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      updatedAt: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

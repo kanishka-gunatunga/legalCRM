@@ -27,7 +27,7 @@ export const LiveChatHistoryOnload = async (req: Request, res: Response, next: N
             },
             order: [['id', 'DESC']],
           });
-          const timestamp = new Date("'"+lastMessage[0].createdAt+"'");
+          const timestamp = new Date("'"+lastMessage[0].created_at+"'");
           const time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });  
         chat += `<div class="p-20 bb-1 d-flex align-items-center justify-content-between pull-up" onclick="GetLiveAllChats('`+chats[i].message_id+`')">
           <div class="d-flex align-items-center">
@@ -70,7 +70,7 @@ export const LiveChatHistoryMessages = async (req: Request, res: Response, next:
       <div class="box-body mb-30">
           <div class="chat-box-six">`
           for (var i = 0; i < chats.length; i++) {
-              const timestamp = new Date("'"+chats[i].createdAt+"'");
+              const timestamp = new Date("'"+chats[i].created_at+"'");
               const formattedDateTime = timestamp.toLocaleString();   
               if(chats[i].sent_by == "customer"){
                 chat += `<div class="rt-bx mb-30 d-flex align-items-start w-p100">
@@ -133,7 +133,7 @@ export const LiveChatHistoryRefresh = async (req: Request, res: Response, next: 
           },
           order: [['id', 'DESC']],
         });
-        const timestamp = new Date("'"+lastMessage[0].createdAt+"'");
+        const timestamp = new Date("'"+lastMessage[0].created_at+"'");
         const time = timestamp.toLocaleTimeString([], { timeStyle: 'short' });  
       chat += `<div class="p-20 bb-1 d-flex align-items-center justify-content-between pull-up" onclick="GetLiveAllChats('`+chats[i].message_id+`')">
         <div class="d-flex align-items-center">
@@ -177,7 +177,7 @@ export const LiveChatHistoryRefreshMessages = async (req: Request, res: Response
   <div class="box-body mb-30">
       <div class="chat-box-six">`
       for (var i = 0; i < chats.length; i++) {
-          const timestamp = new Date("'"+chats[i].createdAt+"'");
+          const timestamp = new Date("'"+chats[i].created_at+"'");
           const formattedDateTime = timestamp.toLocaleString();   
           if(chats[i].sent_by == "customer"){
             chat += `<div class="rt-bx mb-30 d-flex align-items-start w-p100">

@@ -8,8 +8,8 @@ class Agent extends Model {
   public phone!: string;
   public status!: string;
   public profile_picture!: string;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public updated_at!: Date;
+  public created_at!: Date;
 }
 
 Agent.init(
@@ -39,16 +39,16 @@ Agent.init(
         type: new DataTypes.STRING(),
         allowNull: true,
     },
-    createdAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-  updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
   },
   {
     sequelize,
