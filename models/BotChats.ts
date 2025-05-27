@@ -54,6 +54,8 @@ BotChats.init(
     sequelize,
     tableName: 'chat_bot_chats',
     modelName: 'BotChats',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

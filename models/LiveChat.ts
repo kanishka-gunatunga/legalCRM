@@ -54,6 +54,8 @@ LiveChat.init(
     sequelize,
     tableName: 'live_agent_chat_chats',
     modelName: 'LiveChat',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

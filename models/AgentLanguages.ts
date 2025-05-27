@@ -40,6 +40,8 @@ AgentLanguages.init(
     sequelize,
     tableName: 'agent_languages',
     modelName: 'AgentLanguages',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

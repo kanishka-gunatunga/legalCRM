@@ -38,6 +38,8 @@ QuickQuestion.init(
     sequelize,
     tableName: 'quick_questions',
     modelName: 'QuickQuestion',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

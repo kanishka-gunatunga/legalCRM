@@ -64,6 +64,8 @@ Leads.init(
     sequelize,
     tableName: 'leads',
     modelName: 'Leads',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

@@ -49,6 +49,8 @@ Admin.init(
     sequelize,
     tableName: 'other_admin_details',
     modelName: 'Admin',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

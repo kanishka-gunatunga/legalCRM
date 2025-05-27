@@ -64,6 +64,8 @@ ChatHeader.init(
     sequelize,
     tableName: 'live_agent_chat_header',
     modelName: 'ChatHeader',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

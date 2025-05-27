@@ -44,6 +44,8 @@ ChatTimer.init(
     sequelize,
     tableName: 'live_chat_timer',
     modelName: 'ChatTimer',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

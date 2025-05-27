@@ -39,6 +39,8 @@ File.init(
     sequelize,
     tableName: 'files',
     modelName: 'File',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 

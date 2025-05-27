@@ -54,6 +54,8 @@ Agent.init(
     sequelize,
     tableName: 'other_agent_details',
     modelName: 'Agent',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 
