@@ -170,7 +170,7 @@ export const deleteNode = async (req: Request, res: Response, next: Function) =>
     res.json({ status: "success" });
   } catch (error) {
     console.error("Error deleting node:", error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -183,7 +183,7 @@ export const deleteEdge = async (req: Request, res: Response, next: Function) =>
     res.json({ status: "success" });
   } catch (error) {
     console.error('Error deleting edge:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -210,7 +210,7 @@ export const retrieveData = async (req: Request, res: Response, next: Function) 
     });
   } catch (error) {
     console.error('Error retrieving data:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -246,7 +246,7 @@ export const textOnlyData = async (req: Request, res: Response, next: Function) 
     res.json({ status: "success" });
   } catch (error) {
     console.error('Error inserting data:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -283,7 +283,7 @@ export const textBoxData = async (req: Request, res: Response, next: Function) =
     res.json({ status: "success" });
   } catch (error) {
     console.error('Error inserting data:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -314,7 +314,7 @@ export const ButtonData = async (req: Request, res: Response, next: Function) =>
     res.json({ status: "success" });
   } catch (error) {
     console.error('Error inserting data:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 export const ButtonGroup = async (req: Request, res: Response, next: Function) => {
@@ -329,7 +329,7 @@ export const ButtonGroup = async (req: Request, res: Response, next: Function) =
     res.json({ status: "success" });
   } catch (error) {
     console.error('Error updating data:', error);
-    res.status(500).json({ status: "failed", error: error.message });
+    // res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
@@ -394,7 +394,7 @@ export const CardData = async (req: Request, res: Response, next: NextFunction) 
 
   } catch (error) {
     console.error('Error inserting data:', error);
-    res.status(500).json({ status: "error", message: error.message });
+    // res.status(500).json({ status: "error", message: error.message });
   }
 };
 

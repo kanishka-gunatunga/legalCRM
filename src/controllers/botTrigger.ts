@@ -36,11 +36,20 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
     let clientDetailsSubmitStatus = req.body.clientDetailsSubmitStatus;
     let language = req.body.language;
 
+   
+
     const index = pc.index("botdb");
     const namespace = index.namespace("legalCRM-vector-store");
 
     let chatHistory: OpenAIMessage[] = req.body.messages || [];
     const userQuestion = extractLastUserMessage(chatHistory);
+
+    // ================================================
+    //  chat id and chat user message can get from here
+    //  each time message came
+    //  ===============================================
+     console.log("userChatId : ", userChatId)
+      console.log("userQuestion : ", userQuestion)
 
     if (!userQuestion) {
       return res.status(400).json({ error: "No user message found." });
@@ -91,6 +100,9 @@ export const chatResponseTrigger = async (req: RequestWithChatId, res: Response)
 
 
     const botResponse = completion.choices[0]?.message.content?.trim() || "No response from model.";
+     // ================================================
+    //  bot message can get from here
+    //  ===============================================
     console.log("botResponse : ", botResponse)
     chatHistory.push({ role: "assistant", content: botResponse });
 
