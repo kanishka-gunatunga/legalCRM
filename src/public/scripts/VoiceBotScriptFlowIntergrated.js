@@ -42,6 +42,7 @@ function setFormattedOpenedTime() {
 }
 
 
+
 // set time - all the visible time manage
 const currentTime = new Date();
 let hours = currentTime.getHours();
@@ -54,11 +55,15 @@ formattedTime = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
 
 setFormattedOpenedTime();
 
+
+
 // Event listener - clear sessionStorage items on browser refresh
 window.addEventListener("beforeunload", function (event) {
   sessionStorage.removeItem("selectedLanguage");
   sessionStorage.removeItem("chatId");
 });
+
+
 
 // Function - show typing animation
 function showTypingAnimation() {
@@ -261,7 +266,7 @@ function showEndChatAlertBot() {
   }
 }
 
-// Function - start rating
+// Function - chat end
 function handleEndChatBot() {
   sendUnsubmittedLeadData();
     sessionStorage.setItem("leadSubmitted", "true");
@@ -270,7 +275,7 @@ function handleEndChatBot() {
 }
 
 
-// Function - handle ending the chat
+// Function - handle ending the chat and start rating 
 function handleEndChat() {
   clearTimeout(chatTimeoutId);
   // const chatLang = sessionStorage.getItem("selectedLanguage");
@@ -298,6 +303,15 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
 
   if (isList(content)) {
     appendListContent(messageDiv, content);
+  } else if(
+    content.includes(
+      "Sorry, no information was found in the provided context."
+    ) || content.includes(
+      "Lo siento, no se encontró información en el contexto proporcionado."
+    )
+  ){
+    // if no data found message came show this
+    appendLiveAgentContent(messageDiv, content, data);
   } else if (
     content.includes("Se seleccionará el agente de marketing.") ||
     content.includes("Le proporcionaremos la información solicitada en las próximas 24 horas. Mientras tanto, le rogamos que nos proporcione sus datos de contacto para que podamos contactarle si es necesario.") ||
@@ -349,6 +363,31 @@ function appendMessageToResponse(role, content, data, isRatingForm = false) {
   messageDiv.prepend(image);
   responseDiv.appendChild(messageDiv);
   responseDiv.scrollTop = responseDiv.scrollHeight;
+}
+
+
+function appendLiveAgentContent(messageDiv, content, data) {
+  const currentTime = new Date();
+  let hours = currentTime.getHours();
+  const minutes = currentTime.getMinutes().toString().padStart(2, "0");
+  const seconds = currentTime.getSeconds().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; 
+  const formattedTime = `${hours
+    .toString()
+    .padStart(2, "0")}:${minutes} ${ampm}`;
+
+  messageDiv.innerHTML = `<div class="messageWrapper">
+    <span class="botname-message">${formattedTime}</span>
+    <div class="d-flex flex-column">
+        <button id="LiveAgentButton" class="liveagentBtn">Chat with live agent</button>
+      <div>${content}</div>
+    </div>
+  </div>
+      `; 
+  const liveAgentButton = messageDiv.querySelector("#LiveAgentButton");
+  liveAgentButton.addEventListener("click", handleLiveAgentButtonClick(data));
 }
 
 function createMessageDiv(role, content) {
@@ -1337,3 +1376,208 @@ Help Us Serve You Better: Your Details`;
 //   const data = {};
 //   showFormOnChatLoad(messageDiv, data);
 // };
+
+function handleLiveAgentButtonClick(data) {
+  return async function () {
+    try {
+      const switchResponse = await fetch("/switch-to-live-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ chatId: data.chatId }),
+      });
+      const dataSwitchAgent = await switchResponse.json();
+      console.log("switch res : ", dataSwitchAgent);
+      if (dataSwitchAgent.status === "success") {
+        showAlert(`One of our agents will join you soon. we have ${dataSwitchAgent.queued_chats} Please stay tuned.`);
+        chatWithAgent = true;
+        startCheckingForAgent(data);
+      } else {
+        // Show offline form
+        showOfflineForm();
+      }
+
+    } catch (error) {
+      console.error("Error switching to live agent:", error);
+    }
+  };
+}
+
+function showOfflineForm() {
+  const currentTime = new Date();
+  let hours = currentTime.getHours();
+  const minutes = currentTime.getMinutes().toString().padStart(2, "0");
+  const seconds = currentTime.getSeconds().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const formattedTime = `${hours
+    .toString()
+    .padStart(2, "0")}:${minutes} ${ampm}`;
+  const responseDiv = document.getElementById("response");
+  const offlineForm = document.createElement("div");
+  offlineForm.classList.add("bot-message");
+
+  const image = document.createElement("img");
+  image.classList.add("message-image");
+  image.src = "/agent.png";
+
+  const offlineFormHTML = `
+        <div class="p-2 mt-2">
+            <form id="offlineForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btnRatingView">Submit</button>
+            </form>
+        </div>
+    `;
+
+  offlineForm.innerHTML = `<div class="messageWrapper">
+    <span class="botname-message">${formattedTime}</span>
+    <div class="ratingFormTest">
+      <p class="mb-0">Our agents are offline. Please submit your message:</p>
+    </div>
+    ${offlineFormHTML}
+  </div>`;
+  offlineForm.prepend(image);
+
+  responseDiv.appendChild(offlineForm);
+
+  // Scroll to the form
+  offlineForm.scrollIntoView({ behavior: "smooth", block: "end" });
+
+  // Add event listener for form submission
+  const offlineFormElement = document.getElementById("offlineForm");
+  offlineFormElement.addEventListener("submit", handleOfflineFormSubmission);
+}
+
+async function handleOfflineFormSubmission(event) {
+  event.preventDefault();
+
+  const chatId = localStorage.getItem("chatId");
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const subject = document.getElementById("subject").value;
+  const message = document.getElementById("message").value;
+  let selectedLanguage = "";
+
+  const selectedLanguageLocal = localStorage.getItem("selectedLanguage");
+  if (selectedLanguageLocal === "singlish") {
+    selectedLanguage = "sinhala";
+  } else if (selectedLanguageLocal === "tanglish") {
+    selectedLanguage = "tamil";
+  } else {
+    selectedLanguage = selectedLanguageLocal;
+  }
+
+  try {
+    console.log("selectedLanguage : ",selectedLanguage)
+    const response = await fetch("/live-chat-offline-form", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chatId,
+        name,
+        email,
+        subject,
+        message,
+        language: selectedLanguage,
+      }),
+    });
+
+    const responseOfflineForm = await response.json();
+    if (responseOfflineForm.status === "success") {
+      showAlertSuccess(
+        "Your message has been submitted successfully. Our team will get back to you soon."
+      );
+    } else {
+      showAlert("Failed to submit your message. Please try again later.");
+    }
+  } catch (error) {
+    console.error("Error submitting offline form:", error);
+    showAlert(
+      "An error occurred while submitting your message. Please try again later."
+    );
+  }
+}
+
+
+function startCheckingForAgent(data) {
+  intervalId = setInterval(async () => {
+    try {
+      // if (chatStatus === "null"){
+      const response = await fetch("/live-chat-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ chatId: data.chatId }),
+      });
+
+      const dataLiveAgent = await response.json();
+      console.log("response Data agent --: ", dataLiveAgent);
+
+      if (response.ok) {
+        console.log("responseData agent: ", dataLiveAgent);
+        chatStatus = dataLiveAgent.chat_status;
+        if (dataLiveAgent.chat_status === "live") {
+          console.log("response.status - ", dataLiveAgent.chat_status);
+          if (dataLiveAgent.agent_id !== "unassigned") {
+            if (!agentJoined) {
+              showAlert(
+                "Now you are chatting with agent ID: " +
+                dataLiveAgent.agent_name
+              );
+              liveAgentImage = dataLiveAgent.profile_picture;
+              agentJoined = true;
+              chatWithAgent = true;
+            }
+            appendMessageToResponse(
+              "liveagent",
+              dataLiveAgent.agent_message,
+              data
+            );
+          }
+        } else if (dataLiveAgent.chat_status === "closed") {
+          console.log("response.status failed - ", dataLiveAgent.chat_status);
+          if (ratingVisible === false) {
+            handleEndChat();
+            ratingVisible === true;
+          }
+
+          chatWithAgent = false;
+          clearInterval(intervalId); // Stop sending requests if the chat is closed
+        }
+      }
+      // }
+
+    } catch (error) {
+      console.error("Error fetching products data:", error);
+    }
+  }, 5000);
+
+  setTimeout(() => {
+    clearInterval(intervalId);
+    if (!agentJoined) {
+      showAlert("All agents are busy. Please try again later.");
+      console.log("No agents available. API call stopped.");
+    }
+  }, 120000);
+}
